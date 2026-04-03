@@ -1,0 +1,209 @@
+Processing standardized_input_1 in standardized_input.sdf (1/200). 
+Processing standardized_input_2 in standardized_input.sdf (2/200). 
+Processing standardized_input_3 in standardized_input.sdf (3/200). 
+Processing standardized_input_4 in standardized_input.sdf (4/200). 
+Processing standardized_input_5 in standardized_input.sdf (5/200). 
+Processing standardized_input_6 in standardized_input.sdf (6/200). 
+Processing standardized_input_7 in standardized_input.sdf (7/200). 
+Processing standardized_input_8 in standardized_input.sdf (8/200). 
+Processing standardized_input_9 in standardized_input.sdf (9/200). 
+Processing standardized_input_10 in standardized_input.sdf (10/200). 
+Processing standardized_input_11 in standardized_input.sdf (11/200). 
+Processing standardized_input_12 in standardized_input.sdf (12/200). 
+Processing standardized_input_13 in standardized_input.sdf (13/200). 
+Processing standardized_input_14 in standardized_input.sdf (14/200). 
+Processing standardized_input_15 in standardized_input.sdf (15/200). 
+Processing standardized_input_16 in standardized_input.sdf (16/200). 
+Processing standardized_input_17 in standardized_input.sdf (17/200). 
+Processing standardized_input_18 in standardized_input.sdf (18/200). 
+Processing standardized_input_19 in standardized_input.sdf (19/200). 
+Processing standardized_input_20 in standardized_input.sdf (20/200). 
+Processing standardized_input_21 in standardized_input.sdf (21/200). 
+Processing standardized_input_22 in standardized_input.sdf (22/200). 
+Processing standardized_input_23 in standardized_input.sdf (23/200). 
+Processing standardized_input_24 in standardized_input.sdf (24/200). 
+Processing standardized_input_25 in standardized_input.sdf (25/200). 
+Processing standardized_input_26 in standardized_input.sdf (26/200). 
+Processing standardized_input_27 in standardized_input.sdf (27/200). 
+Processing standardized_input_28 in standardized_input.sdf (28/200). 
+Processing standardized_input_29 in standardized_input.sdf (29/200). 
+Processing standardized_input_30 in standardized_input.sdf (30/200). 
+Processing standardized_input_31 in standardized_input.sdf (31/200). 
+Processing standardized_input_32 in standardized_input.sdf (32/200). 
+Processing standardized_input_33 in standardized_input.sdf (33/200). 
+Processing standardized_input_34 in standardized_input.sdf (34/200). 
+Processing standardized_input_35 in standardized_input.sdf (35/200). 
+Processing standardized_input_36 in standardized_input.sdf (36/200). 
+Processing standardized_input_37 in standardized_input.sdf (37/200). 
+Processing standardized_input_39 in standardized_input.sdf (39/200). 
+Processing standardized_input_38 in standardized_input.sdf (38/200). 
+Processing standardized_input_40 in standardized_input.sdf (40/200). 
+Processing standardized_input_41 in standardized_input.sdf (41/200). 
+Processing standardized_input_42 in standardized_input.sdf (42/200). 
+Processing standardized_input_43 in standardized_input.sdf (43/200). 
+Processing standardized_input_44 in standardized_input.sdf (44/200). 
+Processing standardized_input_45 in standardized_input.sdf (45/200). 
+Processing standardized_input_46 in standardized_input.sdf (46/200). 
+Processing standardized_input_47 in standardized_input.sdf (47/200). 
+Processing standardized_input_48 in standardized_input.sdf (48/200). 
+Processing standardized_input_49 in standardized_input.sdf (49/200). 
+Processing standardized_input_50 in standardized_input.sdf (50/200). 
+Processing standardized_input_51 in standardized_input.sdf (51/200). 
+Processing standardized_input_52 in standardized_input.sdf (52/200). 
+Processing standardized_input_53 in standardized_input.sdf (53/200). 
+Processing standardized_input_54 in standardized_input.sdf (54/200). 
+Processing standardized_input_55 in standardized_input.sdf (55/200). 
+Processing standardized_input_56 in standardized_input.sdf (56/200). 
+Processing standardized_input_57 in standardized_input.sdf (57/200). 
+Processing standardized_input_58 in standardized_input.sdf (58/200). 
+Processing standardized_input_59 in standardized_input.sdf (59/200). 
+Processing standardized_input_60 in standardized_input.sdf (60/200). 
+Processing standardized_input_61 in standardized_input.sdf (61/200). 
+Processing standardized_input_62 in standardized_input.sdf (62/200). 
+Processing standardized_input_63 in standardized_input.sdf (63/200). 
+Processing standardized_input_64 in standardized_input.sdf (64/200). 
+Processing standardized_input_66 in standardized_input.sdf (66/200). Average speed: 1.54 s/mol.
+Processing standardized_input_65 in standardized_input.sdf (65/200). Average speed: 2.82 s/mol.
+Processing standardized_input_67 in standardized_input.sdf (67/200). Average speed: 1.04 s/mol.
+Processing standardized_input_68 in standardized_input.sdf (68/200). Average speed: 0.81 s/mol.
+Processing standardized_input_69 in standardized_input.sdf (69/200). Average speed: 0.67 s/mol.
+Processing standardized_input_70 in standardized_input.sdf (70/200). Average speed: 0.57 s/mol.
+Processing standardized_input_71 in standardized_input.sdf (71/200). Average speed: 0.50 s/mol.
+Exception in thread "Thread-4639" Exception in thread "Thread-4640" java.lang.ClassCastException: class org.openscience.cdk.qsar.result.DoubleArrayResult cannot be cast to class org.openscience.cdk.qsar.result.DoubleResult (org.openscience.cdk.qsar.result.DoubleArrayResult and org.openscience.cdk.qsar.result.DoubleResult are in unnamed module of loader 'app')
+	at libpadeldescriptor.EStateAtomTypeDescriptor.calculate(Unknown Source)
+	at libpadeldescriptor.CDK_Descriptor.run(Unknown Source)
+java.lang.NullPointerException
+Processing standardized_input_73 in standardized_input.sdf (73/200). Average speed: 0.46 s/mol.
+Processing standardized_input_72 in standardized_input.sdf (72/200). Average speed: 0.47 s/mol.
+Processing standardized_input_74 in standardized_input.sdf (74/200). Average speed: 0.43 s/mol.
+Processing standardized_input_76 in standardized_input.sdf (76/200). Average speed: 0.40 s/mol.
+Processing standardized_input_75 in standardized_input.sdf (75/200). Average speed: 0.42 s/mol.
+Processing standardized_input_77 in standardized_input.sdf (77/200). Average speed: 0.37 s/mol.
+Processing standardized_input_78 in standardized_input.sdf (78/200). Average speed: 0.36 s/mol.
+Processing standardized_input_79 in standardized_input.sdf (79/200). Average speed: 0.37 s/mol.
+Processing standardized_input_80 in standardized_input.sdf (80/200). Average speed: 0.36 s/mol.
+Processing standardized_input_81 in standardized_input.sdf (81/200). Average speed: 0.36 s/mol.
+Processing standardized_input_82 in standardized_input.sdf (82/200). Average speed: 0.35 s/mol.
+Processing standardized_input_83 in standardized_input.sdf (83/200). Average speed: 0.36 s/mol.
+Processing standardized_input_84 in standardized_input.sdf (84/200). Average speed: 0.36 s/mol.
+Processing standardized_input_85 in standardized_input.sdf (85/200). Average speed: 0.36 s/mol.
+Processing standardized_input_86 in standardized_input.sdf (86/200). Average speed: 0.36 s/mol.
+Processing standardized_input_88 in standardized_input.sdf (88/200). Average speed: 0.34 s/mol.
+Processing standardized_input_87 in standardized_input.sdf (87/200). Average speed: 0.34 s/mol.
+Processing standardized_input_89 in standardized_input.sdf (89/200). Average speed: 0.34 s/mol.
+Processing standardized_input_90 in standardized_input.sdf (90/200). Average speed: 0.32 s/mol.
+Processing standardized_input_91 in standardized_input.sdf (91/200). Average speed: 0.32 s/mol.
+Processing standardized_input_92 in standardized_input.sdf (92/200). Average speed: 0.31 s/mol.
+Processing standardized_input_94 in standardized_input.sdf (94/200). Average speed: 0.34 s/mol.
+Processing standardized_input_93 in standardized_input.sdf (93/200). Average speed: 0.33 s/mol.
+Processing standardized_input_95 in standardized_input.sdf (95/200). Average speed: 0.34 s/mol.
+Processing standardized_input_96 in standardized_input.sdf (96/200). Average speed: 0.32 s/mol.
+Processing standardized_input_97 in standardized_input.sdf (97/200). Average speed: 0.32 s/mol.
+Processing standardized_input_98 in standardized_input.sdf (98/200). Average speed: 0.33 s/mol.
+Processing standardized_input_99 in standardized_input.sdf (99/200). Average speed: 0.33 s/mol.
+Processing standardized_input_100 in standardized_input.sdf (100/200). Average speed: 0.32 s/mol.
+Processing standardized_input_101 in standardized_input.sdf (101/200). Average speed: 0.30 s/mol.
+Processing standardized_input_103 in standardized_input.sdf (103/200). Average speed: 0.29 s/mol.
+Processing standardized_input_104 in standardized_input.sdf (104/200). Average speed: 0.29 s/mol.
+Processing standardized_input_105 in standardized_input.sdf (105/200). Average speed: 0.28 s/mol.
+Processing standardized_input_106 in standardized_input.sdf (106/200). Average speed: 0.27 s/mol.
+Processing standardized_input_107 in standardized_input.sdf (107/200). Average speed: 0.27 s/mol.
+Processing standardized_input_102 in standardized_input.sdf (102/200). Average speed: 0.26 s/mol.
+Processing standardized_input_108 in standardized_input.sdf (108/200). Average speed: 0.26 s/mol.
+Processing standardized_input_110 in standardized_input.sdf (110/200). Average speed: 0.26 s/mol.
+Processing standardized_input_111 in standardized_input.sdf (111/200). Average speed: 0.25 s/mol.
+Processing standardized_input_109 in standardized_input.sdf (109/200). Average speed: 0.25 s/mol.
+Processing standardized_input_112 in standardized_input.sdf (112/200). Average speed: 0.25 s/mol.
+Processing standardized_input_114 in standardized_input.sdf (114/200). Average speed: 0.24 s/mol.
+Processing standardized_input_116 in standardized_input.sdf (116/200). Average speed: 0.24 s/mol.
+Processing standardized_input_119 in standardized_input.sdf (119/200). Average speed: 0.25 s/mol.
+Processing standardized_input_118 in standardized_input.sdf (118/200). Average speed: 0.25 s/mol.
+Processing standardized_input_113 in standardized_input.sdf (113/200). Average speed: 0.24 s/mol.
+Processing standardized_input_117 in standardized_input.sdf (117/200). Average speed: 0.24 s/mol.
+Processing standardized_input_115 in standardized_input.sdf (115/200). Average speed: 0.24 s/mol.
+Processing standardized_input_122 in standardized_input.sdf (122/200). Average speed: 0.21 s/mol.
+Processing standardized_input_120 in standardized_input.sdf (120/200). Average speed: 0.21 s/mol.
+Processing standardized_input_123 in standardized_input.sdf (123/200). Average speed: 0.21 s/mol.
+Processing standardized_input_125 in standardized_input.sdf (125/200). Average speed: 0.20 s/mol.
+Processing standardized_input_121 in standardized_input.sdf (121/200). Average speed: 0.20 s/mol.
+Processing standardized_input_126 in standardized_input.sdf (126/200). Average speed: 0.20 s/mol.
+Processing standardized_input_127 in standardized_input.sdf (127/200). Average speed: 0.20 s/mol.
+Processing standardized_input_124 in standardized_input.sdf (124/200). Average speed: 0.20 s/mol.
+Processing standardized_input_129 in standardized_input.sdf (129/200). Average speed: 0.19 s/mol.
+Processing standardized_input_128 in standardized_input.sdf (128/200). Average speed: 0.19 s/mol.
+Processing standardized_input_130 in standardized_input.sdf (130/200). Average speed: 0.20 s/mol.
+Exception in thread "Thread-7730" java.lang.NullPointerException
+Exception in thread "Thread-7728" java.lang.ClassCastException: class org.openscience.cdk.qsar.result.DoubleArrayResult cannot be cast to class org.openscience.cdk.qsar.result.DoubleResult (org.openscience.cdk.qsar.result.DoubleArrayResult and org.openscience.cdk.qsar.result.DoubleResult are in unnamed module of loader 'app')
+	at libpadeldescriptor.EStateAtomTypeDescriptor.calculate(Unknown Source)
+	at libpadeldescriptor.CDK_Descriptor.run(Unknown Source)
+Processing standardized_input_131 in standardized_input.sdf (131/200). Average speed: 0.19 s/mol.
+Processing standardized_input_133 in standardized_input.sdf (133/200). Average speed: 0.19 s/mol.
+Processing standardized_input_132 in standardized_input.sdf (132/200). Average speed: 0.19 s/mol.
+Processing standardized_input_134 in standardized_input.sdf (134/200). Average speed: 0.19 s/mol.
+Processing standardized_input_142 in standardized_input.sdf (142/200). Average speed: 0.19 s/mol.
+Processing standardized_input_137 in standardized_input.sdf (137/200). Average speed: 0.18 s/mol.
+Processing standardized_input_139 in standardized_input.sdf (139/200). Average speed: 0.19 s/mol.
+Processing standardized_input_138 in standardized_input.sdf (138/200). Average speed: 0.19 s/mol.
+Processing standardized_input_140 in standardized_input.sdf (140/200). Average speed: 0.19 s/mol.
+Processing standardized_input_135 in standardized_input.sdf (135/200). Average speed: 0.19 s/mol.
+Processing standardized_input_136 in standardized_input.sdf (136/200). Average speed: 0.18 s/mol.
+Processing standardized_input_143 in standardized_input.sdf (143/200). Average speed: 0.20 s/mol.
+Processing standardized_input_141 in standardized_input.sdf (141/200). Average speed: 0.19 s/mol.
+Processing standardized_input_144 in standardized_input.sdf (144/200). Average speed: 0.20 s/mol.
+Processing standardized_input_145 in standardized_input.sdf (145/200). Average speed: 0.18 s/mol.
+Processing standardized_input_147 in standardized_input.sdf (147/200). Average speed: 0.19 s/mol.
+Processing standardized_input_146 in standardized_input.sdf (146/200). Average speed: 0.18 s/mol.
+Processing standardized_input_149 in standardized_input.sdf (149/200). Average speed: 0.19 s/mol.
+Processing standardized_input_148 in standardized_input.sdf (148/200). Average speed: 0.19 s/mol.
+Processing standardized_input_150 in standardized_input.sdf (150/200). Average speed: 0.18 s/mol.
+Processing standardized_input_151 in standardized_input.sdf (151/200). Average speed: 0.19 s/mol.
+Processing standardized_input_153 in standardized_input.sdf (153/200). Average speed: 0.18 s/mol.
+Processing standardized_input_152 in standardized_input.sdf (152/200). Average speed: 0.18 s/mol.
+Processing standardized_input_154 in standardized_input.sdf (154/200). Average speed: 0.19 s/mol.
+Processing standardized_input_155 in standardized_input.sdf (155/200). Average speed: 0.21 s/mol.
+Processing standardized_input_156 in standardized_input.sdf (156/200). Average speed: 0.20 s/mol.
+Processing standardized_input_157 in standardized_input.sdf (157/200). Average speed: 0.20 s/mol.
+Processing standardized_input_159 in standardized_input.sdf (159/200). Average speed: 0.20 s/mol.
+Processing standardized_input_158 in standardized_input.sdf (158/200). Average speed: 0.20 s/mol.
+Processing standardized_input_160 in standardized_input.sdf (160/200). Average speed: 0.21 s/mol.
+Processing standardized_input_161 in standardized_input.sdf (161/200). Average speed: 0.21 s/mol.
+Processing standardized_input_162 in standardized_input.sdf (162/200). Average speed: 0.21 s/mol.
+Processing standardized_input_163 in standardized_input.sdf (163/200). Average speed: 0.21 s/mol.
+Processing standardized_input_164 in standardized_input.sdf (164/200). Average speed: 0.21 s/mol.
+Processing standardized_input_165 in standardized_input.sdf (165/200). Average speed: 0.21 s/mol.
+Processing standardized_input_166 in standardized_input.sdf (166/200). Average speed: 0.21 s/mol.
+Processing standardized_input_167 in standardized_input.sdf (167/200). Average speed: 0.21 s/mol.
+Processing standardized_input_168 in standardized_input.sdf (168/200). Average speed: 0.21 s/mol.
+Processing standardized_input_169 in standardized_input.sdf (169/200). Average speed: 0.21 s/mol.
+Processing standardized_input_170 in standardized_input.sdf (170/200). Average speed: 0.20 s/mol.
+Processing standardized_input_171 in standardized_input.sdf (171/200). Average speed: 0.20 s/mol.
+Processing standardized_input_172 in standardized_input.sdf (172/200). Average speed: 0.20 s/mol.
+Processing standardized_input_173 in standardized_input.sdf (173/200). Average speed: 0.20 s/mol.
+Processing standardized_input_174 in standardized_input.sdf (174/200). Average speed: 0.20 s/mol.
+Processing standardized_input_175 in standardized_input.sdf (175/200). Average speed: 0.20 s/mol.
+Processing standardized_input_176 in standardized_input.sdf (176/200). Average speed: 0.19 s/mol.
+Processing standardized_input_177 in standardized_input.sdf (177/200). Average speed: 0.19 s/mol.
+Processing standardized_input_178 in standardized_input.sdf (178/200). Average speed: 0.19 s/mol.
+Processing standardized_input_180 in standardized_input.sdf (180/200). Average speed: 0.19 s/mol.
+Processing standardized_input_179 in standardized_input.sdf (179/200). Average speed: 0.19 s/mol.
+Processing standardized_input_181 in standardized_input.sdf (181/200). Average speed: 0.19 s/mol.
+Processing standardized_input_182 in standardized_input.sdf (182/200). Average speed: 0.19 s/mol.
+Processing standardized_input_183 in standardized_input.sdf (183/200). Average speed: 0.19 s/mol.
+Processing standardized_input_184 in standardized_input.sdf (184/200). Average speed: 0.18 s/mol.
+Processing standardized_input_185 in standardized_input.sdf (185/200). Average speed: 0.18 s/mol.
+Processing standardized_input_186 in standardized_input.sdf (186/200). Average speed: 0.18 s/mol.
+Processing standardized_input_187 in standardized_input.sdf (187/200). Average speed: 0.18 s/mol.
+Processing standardized_input_189 in standardized_input.sdf (189/200). Average speed: 0.18 s/mol.
+Processing standardized_input_190 in standardized_input.sdf (190/200). Average speed: 0.18 s/mol.
+Processing standardized_input_188 in standardized_input.sdf (188/200). Average speed: 0.18 s/mol.
+Processing standardized_input_191 in standardized_input.sdf (191/200). Average speed: 0.18 s/mol.
+Processing standardized_input_192 in standardized_input.sdf (192/200). Average speed: 0.18 s/mol.
+Processing standardized_input_194 in standardized_input.sdf (194/200). Average speed: 0.17 s/mol.
+Processing standardized_input_193 in standardized_input.sdf (193/200). Average speed: 0.17 s/mol.
+Processing standardized_input_195 in standardized_input.sdf (195/200). Average speed: 0.17 s/mol.
+Processing standardized_input_196 in standardized_input.sdf (196/200). Average speed: 0.17 s/mol.
+Processing standardized_input_197 in standardized_input.sdf (197/200). Average speed: 0.17 s/mol.
+Processing standardized_input_198 in standardized_input.sdf (198/200). Average speed: 0.17 s/mol.
+Processing standardized_input_199 in standardized_input.sdf (199/200). Average speed: 0.17 s/mol.
+Processing standardized_input_200 in standardized_input.sdf (200/200). Average speed: 0.17 s/mol.
+Descriptor calculation completed in 32.786 secs . Average speed: 0.16 s/mol.

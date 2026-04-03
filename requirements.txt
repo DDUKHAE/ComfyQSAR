@@ -1,0 +1,14 @@
+numpy
+pandas
+rdkit
+matplotlib
+seaborn
+joblib
+scipy
+padelpy
+statsmodels
+xgboost
+lightgbm
+catboost
+scikit-learn
+pathlib
