@@ -86,7 +86,7 @@ Two screening modes are available:
 - Python 3.10 or higher
 - Java Runtime Environment (JRE 11+) for PaDEL-Descriptor
 
-### Method 1: Git Clone
+### Method : Git Clone
 
 ```bash
 cd ComfyUI/custom_nodes
@@ -97,11 +97,6 @@ pip install -r requirements.txt
 
 Restart ComfyUI.
 
-### Method 2: ComfyUI Manager
-
-1. Open ComfyUI Manager
-2. Search for "ComfyQSAR"
-3. Click "Install" and restart ComfyUI
 
 ### Verify Installation
 
