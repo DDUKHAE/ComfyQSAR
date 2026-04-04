@@ -311,50 +311,6 @@ See [README_CustomScreening.md](README_CustomScreening.md) for details.
 
 ---
 
-## Examples
-
-### Example 1: PTP1B Classification
-
-**Goal**: Predict PTP1B inhibitor activity (active/inactive)
-
-**Example files included:**
-
-- `example/CL_example/` — positive and negative compound files
-- `PTP1B_prediction_QSAR_model.pkl` — pre-trained model
-- `selected_features_V3.txt` — feature list for the pre-trained model
-
-**Typical results:**
-
-- Accuracy: >85%
-- F1-Score: >0.82
-- ROC-AUC: >0.90
-
-### Example 2: Regression Workflow
-
-**Example files included:**
-
-- `example/RG_example/` — SMILES and activity value files
-
-### Example 3: Virtual Screening
-
-**Pre-computed databases** (`Screening_DB/`):
-
-| Database                 | Compounds |
-| ------------------------ | --------- |
-| IBS Natural Products     | 3,678     |
-| IBS Synthetic Products 1 | 5,629     |
-| IBS Synthetic Products 2 | 3,424     |
-| IBS Synthetic Products 3 | 9,690     |
-| Asinex                   | 10,177    |
-| NCI                      | 10,283    |
-| ZINC Natural Products    | 9,644     |
-
-**Custom screening example:**
-
-- `example/PTP1B_custom.sdf` — example SDF for Custom User Screener
-
----
-
 ## Output File Structure
 
 ```
@@ -386,20 +342,5 @@ See [requirements.txt](requirements.txt) for the complete list.
 GNU General Public License v3.0 — see [LICENSE](LICENSE) for details.
 
 ---
-
-## Acknowledgments
-
-- Built on [ComfyUI](https://github.com/comfyanonymous/ComfyUI) by comfyanonymous
-- Cheminformatics: [RDKit](https://www.rdkit.org/)
-- Descriptor calculation: [PaDEL-Descriptor](http://www.yapcwsoft.com/dd/padeldescriptor/) via [padelpy](https://github.com/ecrl/padelpy)
-- Machine learning: [scikit-learn](https://scikit-learn.org/), [XGBoost](https://xgboost.readthedocs.io/), [LightGBM](https://lightgbm.readthedocs.io/)
-
----
-
-<div align="center">
-
-**Made for the drug discovery and cheminformatics community**
-
-[Back to Top](#comfyqsar)
 
 </div>
