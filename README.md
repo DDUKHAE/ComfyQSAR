@@ -133,6 +133,8 @@ After restart, look for these node categories in the node browser:
 
 ### Regression Workflow
 
+![Regression workflow example](https://github.com/DDUKHAE/ComfyQSAR/blob/main/example/Regression_workflow.png)
+
 Same 8-step structure with regression-specific nodes under `QSAR/REGRESSION`.
 
 ### Virtual Screening
