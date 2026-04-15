@@ -90,7 +90,7 @@ Two screening modes are available:
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/YourUsername/ComfyQSAR.git
+git clone https://github.com/DDUKHAE/ComfyQSAR.git
 cd ComfyQSAR
 pip install -r requirements.txt
 ```
