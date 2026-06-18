@@ -105,7 +105,7 @@ class QSARDataSplit_Classification:
             "========================================"
         )
 
-        return {"ui": {"text": log_message}, "result": (str(output_train), str(output_test), str(output_x_test), str(output_y_test))}
+        return {"ui": {"text": log_message}, "result": (str(output_train), str(output_x_test), str(output_y_test))}
 
 NODE_CLASS_MAPPINGS = {
     "QSARDataSplit_Classification": QSARDataSplit_Classification,
