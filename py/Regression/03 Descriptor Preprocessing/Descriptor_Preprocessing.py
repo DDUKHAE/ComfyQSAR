@@ -35,11 +35,9 @@ def remove_high_nan_cols_regression(df, threshold):
     nan_percentage = df.isna().mean()
     retained_columns = nan_percentage[nan_percentage <= threshold].index.tolist()
 
-    if "SMILES" not in retained_columns:
-        retained_columns.append("SMILES")
-
-    if "value" not in retained_columns:
-        retained_columns.append("value")
+    for column in ["Name", "SMILES", "value"]:
+        if column in df.columns and column not in retained_columns:
+            retained_columns.append(column)
 
     filtered_df = df[retained_columns]
     removed_count = initial_cols - len(filtered_df.columns)
