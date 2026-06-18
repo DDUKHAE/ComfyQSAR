@@ -45,15 +45,32 @@ def remove_high_nan_cols_regression(df, threshold):
     return filtered_df, removed_count
 
 def impute_missing_values_regression(df, method):
-    smiles_values = df[["SMILES", "value"]]
-    descriptors = df.drop(columns=["SMILES", "value"])
+    non_descriptor_cols = [
+        col for col in ["Name", "value"]
+        if col in df.columns
+    ]
 
-    missing_count = descriptors.isna().sum().sum()
+    descriptor_cols = [
+        col for col in df.columns
+        if col not in non_descriptor_cols
+    ]
+
+    descriptors = df[descriptor_cols].copy()
+    missing_count = int(descriptors.isna().sum().sum())
 
     imputer = SimpleImputer(strategy=method)
-    imputed_descriptors = pd.DataFrame(imputer.fit_transform(descriptors), columns=descriptors.columns)
+    imputed_descriptors = pd.DataFrame(
+        imputer.fit_transform(descriptors),
+        columns=descriptor_cols,
+    )
 
-    final_df = pd.concat([smiles_values.reset_index(drop=True), imputed_descriptors.reset_index(drop=True)], axis=1)
+    final_df = pd.concat(
+        [
+            df[non_descriptor_cols].reset_index(drop=True),
+            imputed_descriptors.reset_index(drop=True),
+        ],
+        axis=1,
+    )
 
     return final_df, missing_count
 
