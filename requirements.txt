@@ -12,3 +12,4 @@ lightgbm
 catboost
 scikit-learn
 pathlib
+requests
