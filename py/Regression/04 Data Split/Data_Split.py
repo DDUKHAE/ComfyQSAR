@@ -21,7 +21,8 @@ class QSARDataSplit_Regression:
     CATEGORY = "QSAR/REGRESSION"
     OUTPUT_NODE = True
 
-    def split_dataset_regression(
+    def execute(
+        self,
         input_file,
         output_dir="./split_output",
         test_size=0.2,
