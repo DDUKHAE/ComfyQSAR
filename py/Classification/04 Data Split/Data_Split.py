@@ -43,6 +43,7 @@ class QSARDataSplit_Classification:
     def execute(
         self,
         input_file,
+        stratify
         output_dir="./split_output",
         test_size=0.2,
         random_state=42,
