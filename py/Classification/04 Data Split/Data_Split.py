@@ -41,6 +41,7 @@ class QSARDataSplit_Classification:
     OUTPUT_NODE = True
 
     def execute(
+        self,
         input_file,
         output_dir="./split_output",
         test_size=0.2,
