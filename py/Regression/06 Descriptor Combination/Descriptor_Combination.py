@@ -24,23 +24,23 @@ from sklearn.pipeline import make_pipeline
 _Worker_X = None
 _Worker_y = None
 
-def worker_init(X_shared, y_shared):
+def worker_init(X, y):
     global _Worker_X, _Worker_y
-    _Worker_X = X_shared
-    _Worker_y = y_shared
+    _Worker_X = X
+    _Worker_y = y
 
 def evaluate_combination_regression(feature_indices):
     try:
         if _Worker_X is None or _Worker_y is None:
-            return feature_indices, -999.0
+            raise RuntimeError("Regression worker was not initialized.")
             
         X_subset = _Worker_X[:, list(feature_indices)]
         pipeline = make_pipeline(StandardScaler(), LinearRegression())
         cv = KFold(n_splits=5, shuffle=True, random_state=42)
-        scores = cross_val_score(pipeline, X_subset, _Worker_y, cv=cv, scoring='r2')
-        return feature_indices, scores.mean()
-    except Exception:
-        return feature_indices, -999.0
+        scores = cross_val_score(pipeline, X_subset, _Worker_y, cv=cv, scoring='r2', n_jobs=1).mean()
+        return feature_indices, scores
+    except Exception as e:
+        return feature_indices, float("-inf")
 
 
 class Regression_Feature_Combination_Search:
@@ -50,7 +50,7 @@ class Regression_Feature_Combination_Search:
             "required": {
                 "input_file": ("STRING", {}),
                 "max_features": ("INT", {"default": 3, "min": 2, "max": 15}),
-                "num_cores": ("INT", {"default": -1, "min": -1, "max": multiprocessing.cpu_count()}),
+                "num_cores": ("INT", {"default": 16, "min": 1, "max": multiprocessing.cpu_count()}),
                 "top_n": ("INT", {"default": 5, "min": 1, "max": 100}),
                 "chunk_size": ("INT", {"default": 2000, "min" : 1}),
                 "target_column": ("STRING", {"default": "value"}),
@@ -75,18 +75,36 @@ class Regression_Feature_Combination_Search:
             X = df.drop(columns=[target_column]).to_numpy()
             y = df[target_column].to_numpy()
             feature_names = df.drop(columns=[target_column]).columns.tolist()
-            
-            cores = multiprocessing.cpu_count() if num_cores == -1 else min(num_cores, multiprocessing.cpu_count())
+
             top_results = []
             best_per_feature_count = {}
-            with Pool(cores, initializer=worker_init, initargs=(X, y)) as pool:
+
+            pool = None
+
+            if num_cores == 1:
+                worker_init(X, y)
+            else:
+                context = multiprocessing.get_context("spawn")
+                pool = context.Pool(
+                    num_cores,
+                    initializer=worker_init,
+                    initargs=(X, y),
+                )
+            
+            try:
                 for n_features in range(2, min(max_features + 1, len(feature_names) + 1)):
                     num_combs = comb(X.shape[1], n_features)
                     combinations_iter = itertools.combinations(range(X.shape[1]), n_features)
-                    results_iterator = pool.imap_unordered(
-                        evaluate_combination_regression, 
-                        combinations_iter, 
-                        chunksize=chunk_size
+                    if pool is None:
+                        results_iterator = map(
+                            evaluate_combination_regression,
+                            combinations_iter,
+                        )
+                    else:
+                        results_iterator = pool.imap_unordered(
+                            evaluate_combination_regression,
+                            combinations_iter,
+                            chunksize=chunk_size,
                     )
                     
                     if TQDM_INSTALLED:
@@ -109,6 +127,11 @@ class Regression_Feature_Combination_Search:
                         elif r2 > top_results[-1]['R2']:
                             top_results[-1] = result
                             top_results.sort(key=lambda x: x['R2'], reverse=True)
+
+            finally:
+                if pool is not None:
+                    pool.close()
+                    pool.join()
 
             if not top_results:
                 return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("",)}

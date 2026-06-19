@@ -20,26 +20,36 @@ try:
 except ImportError:
     TQDM_INSTALLED = False
 
-_Worker_X = None
-_Worker_y = None
+_WORKER_X = None
+_WORKER_Y = None
 
 def worker_init(X_shared, y_shared):
-    global _Worker_X, _Worker_y
-    _Worker_X = X_shared
-    _Worker_y = y_shared
+    global _WORKER_X, _WORKER_Y
+    _WORKER_X = X_shared
+    _WORKER_Y = y_shared
 
-def evaluate_combination_classification(feature_indices):
+def evaluate_classification(feature_indices):
     try:
-        if _Worker_X is None or _Worker_y is None:
-            return feature_indices, 0.0
-            
-        X_subset = _Worker_X[:, list(feature_indices)]
-        pipeline = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000, solver='liblinear'))
+        if _WORKER_X is None or _WORKER_Y is None:
+            raise RuntimeError("Classification worker was not initialized.")
+
+        X_subset = _WORKER_X[:, list(feature_indices)]
+        pipeline = make_pipeline(
+            StandardScaler(),
+            LogisticRegression(max_iter=1000, solver="liblinear"),
+        )
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-        scores = cross_val_score(pipeline, X_subset, _Worker_y, cv=cv, scoring='accuracy')
-        return feature_indices, scores.mean()
-    except Exception:
-        return feature_indices, 0.0
+        score = cross_val_score(
+            pipeline,
+            X_subset,
+            _WORKER_Y,
+            cv=cv,
+            scoring="accuracy",
+            n_jobs=1,
+        ).mean()
+        return feature_indices, score
+    except Exception as e:
+        return feature_indices, float("-inf")
 
 class Feature_Combination_Search:
     @classmethod
@@ -48,7 +58,7 @@ class Feature_Combination_Search:
             "required" : {
                 "input_file" : ("STRING", {"default" : ""}),
                 "max_features" : ("INT", {"default" : 5, "min" : 1, "step": 1}),
-                "num_cores" : ("INT", {"default" : 48, "min" : 1, "step": 1}),
+                "num_cores" : ("INT", {"default" : multiprocessing.cpu_count(), "max" : multiprocessing.cpu_count(), "min" : 1, "step": 1}),
                 "top_n" : ("INT", {"default" : 3, "min" : 1, "step" : 1}),
                 "chunk_size" : ("INT", {"default" : 2000}),
             }
@@ -73,21 +83,36 @@ class Feature_Combination_Search:
             y = df["Label"].to_numpy()
             feature_names = df.drop(columns=["Label"]).columns.tolist()
             
-            cores = multiprocessing.cpu_count() if num_cores == -1 else min(num_cores, multiprocessing.cpu_count())
             top_results = []
             best_per_feature_count = {}
 
-            pool = Pool(cores, initializer=worker_init, initargs=(X, y))
+            pool = None
+
+            if num_cores == 1:
+                worker_init(X, y)
+            else:
+                context = multiprocessing.get_context("spawn")
+                pool = context.Pool(
+                    num_cores,
+                    initializer=worker_init,
+                    initargs=(X, y),
+                )
             
             try:
                 for n_features in range(2, min(max_features + 1, len(feature_names) + 1)):
                     num_combs = comb(X.shape[1], n_features)
                     combinations_iter = itertools.combinations(range(X.shape[1]), n_features)
-                    results_iterator = pool.imap_unordered(
-                        evaluate_combination_classification, 
-                        combinations_iter, 
-                        chunksize=chunk_size
-                    )
+                    if pool is None:
+                        results_iterator = map(
+                            evaluate_classification,
+                            combinations_iter,
+                        )
+                    else:
+                        results_iterator = pool.imap_unordered(
+                            evaluate_classification,
+                            combinations_iter,
+                            chunksize=chunk_size,
+                        )
                     
                     if TQDM_INSTALLED:
                         results_iterator = tqdm(results_iterator, total=num_combs, desc=f"Features: {n_features}")
@@ -110,8 +135,9 @@ class Feature_Combination_Search:
                             top_results[-1] = result
                             top_results.sort(key=lambda x: x['Accuracy'], reverse=True)
             finally:
-                pool.close()
-                pool.join()
+                if pool is not None:
+                    pool.close()
+                    pool.join()
                 
             if not top_results:
                 return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("",)}
