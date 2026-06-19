@@ -9,14 +9,13 @@ class QSARDataSplit_Regression:
         return {
             "required": {
                 "input_file": ("STRING", {"default": ""}),
-                "output_dir": ("STRING", {"default": "./split_output"}),
                 "test_size": ("FLOAT", {"default": 0.2, "min": 0.05, "max": 0.5, "step": 0.05}),
                 "random_state": ("INT", {"default": 42, "min": 0, "max": 9999}),
             }
         }
 
     RETURN_TYPES = ("STRING", "STRING", "STRING")
-    RETURN_NAMES = ("train_path", "X_test_path", "y_test_path")
+    RETURN_NAMES = ("TRAINING_DATA", "X_TEST", "Y_TEST")
     FUNCTION = "execute"
     CATEGORY = "QSAR/REGRESSION"
     OUTPUT_NODE = True
@@ -24,12 +23,12 @@ class QSARDataSplit_Regression:
     def execute(
         self,
         input_file,
-        output_dir="./split_output",
         test_size=0.2,
         random_state=42,
         target_column="value"
     ):
 
+        output_dir = "./split_output"
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
 
