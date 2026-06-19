@@ -22,7 +22,7 @@ class RandomForest_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("output_file",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
     FUNCTION = "random_forest_feature_selection"
     CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
