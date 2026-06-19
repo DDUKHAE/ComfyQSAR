@@ -49,9 +49,9 @@ class Feature_Combination_Search:
             "required": {
                 "input_file": ("STRING", {"default": ""}),
                 "max_features": ("INT", {"default": 5, "min": 1, "step": 1}),
-                "num_cores": ("INT", {"default": multiprocessing.cpu_count(), "max": multiprocessing.cpu_count(), "min": 1, "step": 1}),
+                "num_cores": ("INT", {"default": -1, "max": multiprocessing.cpu_count(), "min": -1, "step": 1}),
                 "top_n": ("INT", {"default": 3, "min": 1, "step": 1}),
-                "chunk_size": ("INT", {"default": 2000}),
+                "chunk_size": ("INT", {"default": 2000, "min": 1}),
             }
         }
 
@@ -74,17 +74,27 @@ class Feature_Combination_Search:
             y = df["Label"].to_numpy()
             feature_names = df.drop(columns=["Label"]).columns.tolist()
 
+            cores = -1 if num_cores == -1 else max(1, min(num_cores, multiprocessing.cpu_count()))
             top_results = []
             best_per_feature_count = {}
 
             for n_features in range(2, min(max_features + 1, len(feature_names) + 1)):
                 num_combs = comb(X.shape[1], n_features)
-                combinations_list = list(itertools.combinations(range(X.shape[1]), n_features))
+                combinations_iter = itertools.combinations(range(X.shape[1]), n_features)
 
-                raw_results = Parallel(n_jobs=num_cores, backend="loky")(
+                raw_results = Parallel(
+                    n_jobs=cores,
+                    backend="loky",
+                    return_as="generator",
+                    batch_size=chunk_size,
+                    pre_dispatch="2*n_jobs",
+                )(
                     delayed(evaluate_classification_direct)(X, y, indices)
-                    for indices in (tqdm(combinations_list, total=num_combs, desc=f"Features: {n_features}") if TQDM_INSTALLED else combinations_list)
+                    for indices in combinations_iter
                 )
+
+                if TQDM_INSTALLED:
+                    raw_results = tqdm(raw_results, total=num_combs, desc=f"Features: {n_features}")
 
                 for feature_indices, acc in raw_results:
                     result = {
