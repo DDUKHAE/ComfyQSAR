@@ -27,6 +27,42 @@ function getAllConditionalParams() {
   return ["importance_model", "alpha", "max_iter", "n_estimators"];
 }
 
+// 손상되거나 이전 형식으로 저장된 workflow 위젯 값 복구
+function normalizeCorrelationWidgets(node, useDefaults = false) {
+  const thresholdWidget = node.widgets?.find((w) => w.name === "threshold");
+  const correlationModeWidget = node.widgets?.find(
+    (w) => w.name === "correlation_mode",
+  );
+  const importanceModelWidget = node.widgets?.find(
+    (w) => w.name === "importance_model",
+  );
+
+  if (thresholdWidget) {
+    const threshold = Number(thresholdWidget.value);
+    if (!Number.isFinite(threshold) || threshold < 0.5 || threshold > 1.0) {
+      thresholdWidget.value = 0.95;
+    }
+  }
+
+  if (correlationModeWidget && useDefaults) {
+    correlationModeWidget.value = "target_based";
+  } else if (
+    correlationModeWidget &&
+    !["target_based", "upper", "lower"].includes(correlationModeWidget.value)
+  ) {
+    correlationModeWidget.value = "target_based";
+  }
+
+  if (importanceModelWidget && useDefaults) {
+    importanceModelWidget.value = "lasso";
+  } else if (
+    importanceModelWidget &&
+    !["lasso", "random_forest"].includes(importanceModelWidget.value)
+  ) {
+    importanceModelWidget.value = "lasso";
+  }
+}
+
 // 위젯 토글 함수 (ComfyUI 표준 방식)
 function toggleWidget(node, widget, show = false, nodeKey = "") {
   if (!widget) {
@@ -73,8 +109,7 @@ function toggleWidget(node, widget, show = false, nodeKey = "") {
       `[Feature Selection Advanced] ✅ Shown: ${widget.name} (restored type: ${props.origType})`,
     );
   } else {
-    // 위젯 완전 숨김
-    widget.type = null;
+    // 값과 직렬화 순서를 보존하면서 화면에서만 숨김
     widget.computeSize = () => [0, 0];
     widget.computedHeight = 0;
     widget.hidden = true;
@@ -85,7 +120,7 @@ function toggleWidget(node, widget, show = false, nodeKey = "") {
     }
 
     console.log(
-      `[Feature Selection Advanced] ❌ Hidden: ${widget.name} (type: null, hidden: true)`,
+      `[Feature Selection Advanced] ❌ Hidden: ${widget.name} (type preserved: ${widget.type}, hidden: true)`,
     );
   }
 }
@@ -138,6 +173,8 @@ app.registerExtension({
         console.log(
           `[Feature Selection Advanced] Node created: ${this.title || nodeData.name}`,
         );
+
+        normalizeCorrelationWidgets(this);
 
         // 노드별 고유 키
         const nodeKey = `${nodeData.name}_${this.id || Date.now()}`;
@@ -334,6 +371,13 @@ app.registerExtension({
           correlationModeWidget.value || "target_based",
           importanceModelWidget?.value || "lasso",
         );
+      };
+
+      const originalOnConfigure = nodeType.prototype.onConfigure;
+      nodeType.prototype.onConfigure = function () {
+        const result = originalOnConfigure?.apply(this, arguments);
+        normalizeCorrelationWidgets(this, true);
+        return result;
       };
 
       // 노드 제거 시 정리
