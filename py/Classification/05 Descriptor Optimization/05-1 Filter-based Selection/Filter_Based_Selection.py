@@ -17,7 +17,7 @@ class Remove_Low_Variance_Descriptors_Classification:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("LOW_VAR_FILTERED_PATH",)
+    RETURN_NAMES = ("LOW_VARIANCE_DESCRIPTORS",)
     FUNCTION = "run"
     CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.1 Filter-based Selection"
     OUTPUT_NODE = True
@@ -64,7 +64,7 @@ class Remove_High_Correlation_Features_Classification:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "input_file": ("STRING", {"forceInput": True}),
+                "input_file": ("STRING", {"forceInput": False}),
                 "threshold": ("FLOAT", {"default": 0.95, "min": 0.5, "max": 1.0, "step": 0.01}),
                 "correlation_mode": (["target_based", "upper", "lower"], {"default": "target_based"}),
                 "importance_model": (["lasso", "random_forest"], {"default": "lasso"}),
@@ -72,13 +72,20 @@ class Remove_High_Correlation_Features_Classification:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("OPTIMIZED_DATA_PATH",)
+    RETURN_NAMES = ("OPTIMIZED_DESCRIPTORS",)
     FUNCTION = "run"
     CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.1 Filter-based Selection"
     OUTPUT_NODE = True
 
     @classmethod
     def run(cls, input_file, threshold, correlation_mode, importance_model):
+        try:
+            threshold = float(threshold)
+        except (TypeError, ValueError):
+            threshold = 0.95
+        if not np.isfinite(threshold) or not 0.5 <= threshold <= 1.0:
+            threshold = 0.95
+
         output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Classification_Optimized")
         os.makedirs(output_dir, exist_ok=True)
 
@@ -166,7 +173,7 @@ class Descriptor_Optimization_Classification:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("OPTIMIZED_DATA_PATH",)
+    RETURN_NAMES = ("OPTIMIZED_DESCRIPTORS",)
     FUNCTION = "run"
     CATEGORY = "QSAR/CLASSIFICATION/OTHERS"
     OUTPUT_NODE = True
