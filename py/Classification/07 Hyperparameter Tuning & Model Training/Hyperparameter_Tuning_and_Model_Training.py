@@ -35,7 +35,7 @@ except ImportError:
 CLASSIFICATION_MODEL_CONFIG = {
     "random_forest": {"model": RandomForestClassifier, "params": ['rf_n_estimators', 'rf_max_depth', 'rf_min_samples_split']},
     "decision_tree": {"model": DecisionTreeClassifier, "params": ['dt_max_depth', 'dt_min_samples_split', 'dt_min_samples_leaf', 'dt_criterion']},
-    "logistic": {"model": LogisticRegression, "params": ['lr_C', 'lr_penalty'], "static_params": {"solver": "saga", "max_iter": 2000}},
+    "logistic": {"model": LogisticRegression, "params": ['lr_C', 'lr_penalty'], "static_params": {"solver": "liblinear", "max_iter": 2000}},
     "lasso": {"model": LogisticRegression, "params": ['lasso_C'], "static_params": {"penalty": "l1", "solver": "liblinear", "max_iter": 2000}},
     "svm": {"model": SVC, "params": ['svm_C', 'svm_kernel', 'svm_gamma'], "static_params": {"probability": True}},
 }
