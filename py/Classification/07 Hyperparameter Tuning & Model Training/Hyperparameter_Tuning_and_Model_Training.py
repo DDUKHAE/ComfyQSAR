@@ -159,7 +159,7 @@ class Hyperparameter_Grid_Search_Classification:
 
     def perform_grid_search(self, input_file, algorithm, target_column, test_size = 0.2, **kwargs):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_GridSearch")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "07_Model_Training")
             os.makedirs(output_dir, exist_ok=True)
             user_params = {k: parse_param(v) for k, v in kwargs.items() if isinstance(v, str)}
             data = pd.read_csv(input_file)

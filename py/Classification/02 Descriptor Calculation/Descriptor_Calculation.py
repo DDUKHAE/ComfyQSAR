@@ -120,7 +120,7 @@ class Descriptor_Calculations_Classification:
                                         detect_aromaticity, remove_salt, standardize_nitro,
                                         use_file_name_as_molname, retain_order, threads, waiting_jobs,
                                         max_runtime, max_cpd_per_file, headless, log):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR/Descriptor_Calculation")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "02_Descriptor_Calculation")
         os.makedirs(output_dir, exist_ok=True)
 
         padel_options = build_padel_options(

@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
+import folder_paths
 from rdkit import Chem
 from pathlib import Path
 
@@ -126,7 +127,7 @@ class QSARDBScreener:
             predictions = model.predict(X_screen)
             selected_indices = np.where(predictions >= threshold)[0]
 
-        output_dir = os.path.join(str(RESULT_BASE_DIR), db_name)
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Screening", "Database_Screening", db_name)
         sdf_subdir = os.path.join(output_dir, "SDF")
         os.makedirs(sdf_subdir, exist_ok=True)
 

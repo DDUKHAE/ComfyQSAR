@@ -17,14 +17,14 @@ class DecisionTreeFeatureSelectionNode:
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("output_file_path",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
     FUNCTION = "select_features"
     CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
     def select_features(self, input_file_path, target_column, threshold_percentile, max_depth, min_samples_split):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "feature_selection_results/DecisionTree")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(input_file_path)
             if target_column not in df.columns:

@@ -38,7 +38,7 @@ class lgb_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("output_file",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
     FUNCTION = "lightgbm_feature_selection"
     CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
@@ -46,7 +46,7 @@ class lgb_CL:
     def lightgbm_feature_selection(self, input_file, target_column, n_estimators, max_depth,
                                     learning_rate, threshold_mode, threshold, n_iterations,
                                     min_data_in_leaf, min_split_gain, num_cores):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "selected_descriptors_output")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Model_Based")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
         if target_column not in df.columns:

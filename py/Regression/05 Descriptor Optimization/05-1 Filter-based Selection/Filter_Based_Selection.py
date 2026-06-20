@@ -21,7 +21,7 @@ class Remove_Low_Variance_Descriptors_Regression:
     OUTPUT_NODE = True
 
     def run(self, input_file, threshold):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Regression_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
         if "value" not in df.columns:
@@ -74,7 +74,7 @@ class Remove_High_Correlation_Features_Regression:
         if not np.isfinite(threshold) or not 0.5 <= threshold <= 1.0:
             threshold = 0.95
 
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Regression_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
         if "value" not in df.columns:
@@ -148,7 +148,7 @@ class Descriptor_Optimization_Regression:
     OUTPUT_NODE = True
 
     def run(self, input_file, variance_threshold, correlation_threshold, correlation_mode, importance_model):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Regression_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
         if "value" not in df.columns:

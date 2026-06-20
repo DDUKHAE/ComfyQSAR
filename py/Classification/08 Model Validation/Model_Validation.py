@@ -78,7 +78,7 @@ class Model_Validation_Classification:
 
     def validate_model(self, model_path, selected_descriptors_path, X_test_path, y_test_path):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Classification_Validation")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "08_Model_Validation")
             os.makedirs(output_dir, exist_ok=True)
             model, x_test_filtered, y_test = load_classification_inputs(
                 model_path, X_test_path, y_test_path, selected_descriptors_path

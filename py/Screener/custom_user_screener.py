@@ -2,12 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
+import folder_paths
 from rdkit import Chem
 from sklearn.impute import SimpleImputer
 from padelpy import padeldescriptor
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_OUTPUT_ROOT = os.path.join(BASE_DIR, "Custom_DB_Screening_Results")
+DEFAULT_OUTPUT_ROOT = os.path.join(folder_paths.get_output_directory(), "Screening", "Custom_Screening")
 
 class QSARCustomUserScreener:
     @classmethod

@@ -128,7 +128,7 @@ class Standardization_Classification:
     OUTPUT_NODE = True
 
     def standardize_data(self, positive_path: str, negative_path: str) -> Dict[str, Any]:
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR/Standardization")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "01_Data_Load_and_Standardization")
         os.makedirs(output_dir, exist_ok=True)
 
         def process_and_standardize(file_path: str, output_name: str) -> Tuple[str, int]:

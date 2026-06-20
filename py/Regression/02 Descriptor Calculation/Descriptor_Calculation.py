@@ -61,7 +61,7 @@ class Descriptor_Calculations_Regression:
                                log=False, use_file_name_as_molname=False, retain_order=True,
                                max_runtime=10000, max_cpd_per_file=0, headless=True,
                                threads=-1, waiting_jobs=-1):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR/Descriptor_Calculation_Regression")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "02_Descriptor_Calculation")
         os.makedirs(output_dir, exist_ok=True)
         try:
             df = pd.read_csv(standardized_data)

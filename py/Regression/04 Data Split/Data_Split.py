@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import folder_paths
 from sklearn.model_selection import train_test_split
 
 class QSARDataSplit_Regression:
@@ -28,7 +29,7 @@ class QSARDataSplit_Regression:
         target_column="value"
     ):
 
-        output_dir = "./split_output"
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "04_Data_Split")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
 

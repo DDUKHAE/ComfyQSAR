@@ -24,7 +24,7 @@ class Remove_Low_Variance_Descriptors_Classification:
 
     @classmethod
     def run(cls, input_file, threshold):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Classification_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
 
         df = pd.read_csv(input_file)
@@ -86,7 +86,7 @@ class Remove_High_Correlation_Features_Classification:
         if not np.isfinite(threshold) or not 0.5 <= threshold <= 1.0:
             threshold = 0.95
 
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Classification_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
 
         df = pd.read_csv(input_file)
@@ -180,7 +180,7 @@ class Descriptor_Optimization_Classification:
 
     @classmethod
     def run(cls, input_file, variance_threshold, correlation_threshold, correlation_mode, importance_model):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Classification_Optimized")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
 
         df = pd.read_csv(input_file)

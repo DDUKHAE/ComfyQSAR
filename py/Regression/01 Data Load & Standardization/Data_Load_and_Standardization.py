@@ -52,7 +52,7 @@ class Data_Loader_Regression:
             validate_file_path(smiles_file_path, ('.smi', '.csv'))
             validate_file_path(value_file_path, ('.csv',))
 
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR/DataLoad")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "01_Data_Load_and_Standardization")
             os.makedirs(output_dir, exist_ok=True)
 
             smiles_df = pd.read_csv(smiles_file_path, header=None if smiles_file_path.endswith('.smi') else 'infer')
@@ -102,7 +102,7 @@ class Standardization_Regression:
 
     def standardize_data(self, merged_data: str) -> Dict[str, Any]:
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR/Standardization")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "01_Data_Load_and_Standardization")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(merged_data)
             initial_count = len(df)

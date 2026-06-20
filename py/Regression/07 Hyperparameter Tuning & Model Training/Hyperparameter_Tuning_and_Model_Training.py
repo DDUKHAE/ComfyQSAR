@@ -155,7 +155,7 @@ class Hyperparameter_Grid_Search_Regression:
 
     def perform_grid_search(self, input_file, algorithm, target_column, **kwargs):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Regression_GridSearch")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "07_Model_Training")
             os.makedirs(output_dir, exist_ok=True)
             user_params = {k: parse_param(v) for k, v in kwargs.items() if isinstance(v, str)}
             data = pd.read_csv(input_file)

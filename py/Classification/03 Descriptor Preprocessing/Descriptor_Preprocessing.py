@@ -70,7 +70,7 @@ class Replace_inf_with_nan_Classification:
 
     def run(self, descriptors):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(descriptors)
             df, inf_count = replace_inf_classification(df)
@@ -107,7 +107,7 @@ class Remove_high_nan_compounds_Classification:
 
     def run(self, preprocessed_descriptors, threshold):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             initial_rows = len(df)
@@ -147,7 +147,7 @@ class Remove_high_nan_descriptors_Classification:
 
     def run(self, preprocessed_descriptors, threshold):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             initial_cols = df.shape[1]
@@ -187,7 +187,7 @@ class Impute_missing_values_Classification:
 
     def run(self, preprocessed_descriptors, method):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             df, imputed_count = impute_missing_values_classification(df, method)
@@ -227,7 +227,7 @@ class Descriptor_preprocessing_Classification:
 
     def preprocess(self, descriptors, compounds_nan_threshold, descriptors_nan_threshold, imputation_method):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(descriptors)
             initial_shape = f"{df.shape[0]}x{df.shape[1]}"

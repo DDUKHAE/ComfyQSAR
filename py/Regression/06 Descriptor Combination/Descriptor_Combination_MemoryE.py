@@ -54,7 +54,7 @@ class Regression_Feature_Combination_Search:
 
     def find_best_combinations(self, input_file, max_features, num_cores, top_n, chunk_size, target_column):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Regression_CombinationSearch")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "06_Descriptor_Combination")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(input_file)
             

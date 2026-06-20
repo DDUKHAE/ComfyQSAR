@@ -63,7 +63,7 @@ class Feature_Combination_Search:
 
     def descriptor_combination_classification_MemoryE(self, input_file, max_features, num_cores, top_n, chunk_size):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_CombinationSearch")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "06_Descriptor_Combination")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(input_file)
 

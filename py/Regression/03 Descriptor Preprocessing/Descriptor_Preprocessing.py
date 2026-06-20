@@ -87,7 +87,7 @@ class Replace_inf_with_nan_Regression:
 
     def run(self, descriptors):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed_Regression")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(descriptors)
             df, inf_count = replace_inf_regression(df)
@@ -121,7 +121,7 @@ class Remove_high_nan_compounds_Regression:
 
     def run(self, preprocessed_descriptors, threshold):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed_Regression")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             initial = len(df)
@@ -158,7 +158,7 @@ class Remove_high_nan_descriptors_Regression:
 
     def run(self, preprocessed_descriptors, threshold):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed_Regression")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             initial_cols = df.shape[1]
@@ -195,7 +195,7 @@ class Impute_missing_values_Regression:
 
     def run(self, preprocessed_descriptors, method):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed_Regression")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(preprocessed_descriptors)
             df, count = impute_missing_values_regression(df, method)
@@ -232,7 +232,7 @@ class Descriptor_preprocessing_Regression:
 
     def preprocess(self, descriptors, compounds_nan_threshold, descriptors_nan_threshold, imputation_method):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "QSAR_Preprocessed_Regression")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "03_Descriptor_Preprocessing")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(descriptors)
             initial_shape = f"{df.shape[0]}x{df.shape[1]}"

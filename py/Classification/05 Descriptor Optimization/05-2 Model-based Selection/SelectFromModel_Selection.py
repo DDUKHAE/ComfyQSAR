@@ -49,7 +49,7 @@ class select_from_model_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("output_file",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
     FUNCTION = "select_from_model_feature_selection"
     CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
@@ -57,7 +57,7 @@ class select_from_model_CL:
     def select_from_model_feature_selection(self, input_file, target_column, random_state,
                                             model_name, threshold, threshold_num, alpha, max_iter,
                                             n_estimators, max_depth, min_samples_split, learning_rate):
-        output_dir = os.path.join(folder_paths.get_output_directory(), "selected_descriptors_output")
+        output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Model_Based")
         os.makedirs(output_dir, exist_ok=True)
         df = pd.read_csv(input_file)
         if target_column not in df.columns:
