@@ -14,7 +14,7 @@ class decision_tree_CL:
                 "max_depth": ("INT", {"default": 0, "min": 0, "max": 1000}),
                 "min_samples_split": ("INT", {"default": 2, "min": 2, "max": 100}),
                 "criterion": (["gini", "entropy", "log_loss"], {"default": "gini"}),
-                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "absolute", "label_off": "percentile"}),
+                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "importance cutoff (%)", "label_off": "percentile"}),
                 "threshold": ("FLOAT", {"default": 90.0, "min": 0.0, "max": 100.0, "step": 0.1}),
                 "n_iterations": ("INT", {"default": 100, "min": 10, "max": 1000}),
             }
@@ -45,13 +45,15 @@ class decision_tree_CL:
             feature_importance_matrix[i] = model.feature_importances_
         feature_importances = np.mean(feature_importance_matrix, axis=0)
         if threshold_mode:
-            importance_cutoff = threshold
-            log_threshold_type = f"Absolute - {importance_cutoff}"
+            importance_cutoff = threshold / 100.0
+            log_threshold_type = f"Importance cutoff - {threshold}%"
         else:
             importance_cutoff = np.percentile(feature_importances, threshold)
             log_threshold_type = f"Percentile - {threshold}%"
         important_indices = np.where(feature_importances >= importance_cutoff)[0]
-        selected_columns = X.columns[important_indices]
+        selected_columns = X.columns[important_indices].tolist()
+        if not selected_columns:
+            selected_columns = [X.columns[np.argmax(feature_importances)]]
         X_new = X[selected_columns]
         final_feature_count = len(selected_columns)
         removed_features = initial_feature_count - final_feature_count
