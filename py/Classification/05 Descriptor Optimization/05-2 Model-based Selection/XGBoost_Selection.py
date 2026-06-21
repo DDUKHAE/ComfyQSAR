@@ -25,7 +25,7 @@ class xgb_CL:
                 "n_estimators": ("INT", {"default": 100, "min": 10, "max": 1000}),
                 "max_depth": ("INT", {"default": 5, "min": 1, "max": 100}),
                 "learning_rate": ("FLOAT", {"default": 0.1, "min": 0.001, "max": 1.0, "step": 0.01}),
-                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "absolute", "label_off": "percentile"}),
+                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "importance cutoff (%)", "label_off": "percentile"}),
                 "threshold": ("INT", {"default": 90, "min": 1, "max": 100, "step": 1}),
                 "n_iterations": ("INT", {"default": 30, "min": 1, "max": 200}),
                 "num_cores": ("INT", {"default": 4, "min": 1, "max": cpu_count(), "step": 1}),
@@ -56,8 +56,8 @@ class xgb_CL:
             importance_matrix = pool.map(train_xgb_classification, args_list)
         feature_importances = np.mean(np.vstack(importance_matrix), axis=0)
         if threshold_mode:
-            importance_cutoff = threshold
-            log_threshold_type = f"Absolute - {importance_cutoff}"
+            importance_cutoff = threshold / 100.0
+            log_threshold_type = f"Importance cutoff - {threshold}%"
         else:
             importance_cutoff = np.percentile(feature_importances, threshold)
             log_threshold_type = f"Percentile - {threshold}%"
