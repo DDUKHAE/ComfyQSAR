@@ -29,7 +29,7 @@ class RandomForestFeatureSelectionNode:
     def select_features(self, input_file, target_column, n_estimators, max_depth,
                         min_samples_split, criterion, threshold_mode, threshold, n_iterations):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "feature_selection_results/RandomForest")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(input_file)
 
