@@ -15,7 +15,7 @@ class RandomForestFeatureSelectionNode:
             "max_depth": ("INT", {"default": 0, "min": 0, "max": 1000, "step": 1}),
             "min_samples_split": ("INT", {"default": 2, "min": 2, "max": 100, "step": 1}),
             "criterion": (["squared_error", "absolute_error", "friedman_mse", "poisson"], {"default": "squared_error"}),
-            "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "absolute", "label_off": "percentile"}),
+            "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "importance cutoff (%)", "label_off": "percentile"}),
             "threshold": ("INT", {"default": 90, "min": 1, "max": 100, "step": 1}),
             "n_iterations": ("INT", {"default": 100, "min": 10, "max": 1000, "step": 1}),
         }}
@@ -29,7 +29,7 @@ class RandomForestFeatureSelectionNode:
     def select_features(self, input_file, target_column, n_estimators, max_depth,
                         min_samples_split, criterion, threshold_mode, threshold, n_iterations):
         try:
-            output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
+            output_dir = os.path.join(folder_paths.get_output_directory(), "feature_selection_results/RandomForest")
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(input_file)
 
