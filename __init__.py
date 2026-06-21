@@ -90,7 +90,7 @@ _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/XGBoost_Sel
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/LightGBM_Selection.py")
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/RFE_Selection.py")
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/SelectFromModel_Selection.py")
-_load(f"{_REG}/06 Descriptor Combination/Descriptor_Combination.py")
+_load(f"{_REG}/06 Descriptor Combination/Descriptor_Combination_MemoryE.py")
 _load(f"{_REG}/07 Hyperparameter Tuning & Model Training/Hyperparameter_Tuning_and_Model_Training.py")
 _load(f"{_REG}/08 Model Validation/Model_Validation.py")
 
