@@ -28,7 +28,7 @@ class lgb_CL:
                 "n_estimators": ("INT", {"default": 100, "min": 10, "max": 1000}),
                 "max_depth": ("INT", {"default": -1, "min": -1, "max": 1000}),
                 "learning_rate": ("FLOAT", {"default": 0.1, "min": 0.001, "max": 1.0, "step": 0.01}),
-                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "absolute", "label_off": "percentile"}),
+                "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "importance cutoff (%)", "label_off": "percentile"}),
                 "threshold": ("INT", {"default": 90, "min": 1, "max": 100, "step": 1}),
                 "n_iterations": ("INT", {"default": 100, "min": 10, "max": 1000}),
                 "min_data_in_leaf": ("INT", {"default": 1, "min": 1, "max": 100}),
@@ -63,14 +63,19 @@ class lgb_CL:
             results = pool.map(self._train_lightgbm, args_list)
         feature_importance_matrix = np.stack(results)
         feature_importances = np.mean(feature_importance_matrix, axis=0)
+        total_importance = feature_importances.sum()
+        if total_importance > 0:
+            feature_importances = feature_importances / total_importance
         if threshold_mode:
-            importance_cutoff = threshold
-            log_threshold_type = f"Absolute - {importance_cutoff}"
+            importance_cutoff = threshold / 100.0
+            log_threshold_type = f"Importance cutoff - {threshold}%"
         else:
             importance_cutoff = np.percentile(feature_importances, threshold)
             log_threshold_type = f"Percentile - {threshold}%"
         important_indices = np.where(feature_importances >= importance_cutoff)[0]
-        selected_columns = X.columns[important_indices]
+        selected_columns = X.columns[important_indices].tolist()
+        if not selected_columns:
+            selected_columns = [X.columns[np.argmax(feature_importances)]]
         X_new = X[selected_columns]
         final_feature_count = len(selected_columns)
         removed_features = initial_feature_count - final_feature_count
