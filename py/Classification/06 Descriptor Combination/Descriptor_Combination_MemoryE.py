@@ -5,6 +5,7 @@ import itertools
 import multiprocessing
 import traceback
 import folder_paths
+import joblib
 from math import comb
 
 from joblib import Parallel, delayed
@@ -55,8 +56,8 @@ class Feature_Combination_Search:
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("BEST OPTIMAL FEATURES",)
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("OPTIMAL_FEATURE_SET", "MODEL", "SELECTED_DESCRIPTORS")
     FUNCTION = "descriptor_combination_classification_MemoryE"
     CATEGORY = "QSAR/CLASSIFICATION"
     OUTPUT_NODE = True
@@ -115,7 +116,7 @@ class Feature_Combination_Search:
                         top_results.sort(key=lambda x: x["Accuracy"], reverse=True)
 
             if not top_results:
-                return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("",)}
+                return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("", "", "")}
 
             best_per_size_df = pd.DataFrame(best_per_feature_count.values())
             best_per_size_path = os.path.join(output_dir, "Best_combination_per_size_MemoryE.csv")
@@ -131,6 +132,20 @@ class Feature_Combination_Search:
                 if i == 1:
                     output_file = output_path
 
+            selected_features = best_overall_result["Best_Features"]
+            final_model = make_pipeline(
+                StandardScaler(),
+                LogisticRegression(max_iter=1000, solver="liblinear"),
+            )
+            final_model.fit(df[selected_features], y)
+
+            model_path = os.path.join(output_dir, "Combination_Classifier_LogisticRegression.pkl")
+            joblib.dump(final_model, model_path)
+
+            descriptors_path = os.path.join(output_dir, "Combination_Selected_Descriptors.txt")
+            with open(descriptors_path, "w") as f:
+                f.write("\n".join(selected_features))
+
             log_message = (
                 "========================================\n"
                 "🔹 Feature Combination Search (Memory Efficient) Completed! 🔹\n"
@@ -138,12 +153,17 @@ class Feature_Combination_Search:
                 f"🏆 Best CV Accuracy: {best_overall_result['Accuracy']:.4f}\n"
                 f"✨ Optimal Features ({best_overall_result['Num_Features']}): {best_overall_result['Best_Features']}\n"
                 f"💾 Top Ranked Set: {os.path.basename(output_file)}\n"
+                f"💾 Model: {os.path.basename(model_path)}\n"
+                f"💾 Selected Descriptors: {os.path.basename(descriptors_path)}\n"
                 "========================================"
             )
-            return {"ui": {"text": log_message}, "result": (str(output_file),)}
+            return {
+                "ui": {"text": log_message},
+                "result": (str(output_file), str(model_path), str(descriptors_path))
+            }
 
         except Exception as e:
-            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("",)}
+            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("", "", "")}
 
 
 NODE_CLASS_MAPPINGS = {
