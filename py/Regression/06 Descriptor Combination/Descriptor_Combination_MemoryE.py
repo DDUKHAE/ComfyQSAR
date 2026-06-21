@@ -6,6 +6,7 @@ import traceback
 import multiprocessing
 from math import comb
 import folder_paths
+import joblib
 
 from joblib import Parallel, delayed
 
@@ -46,8 +47,8 @@ class Regression_Feature_Combination_Search:
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("BEST_FEATURE_SET",)
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("OPTIMAL_FEATURE_SET", "MODEL", "SELECTED_DESCRIPTORS")
     FUNCTION = "find_best_combinations"
     CATEGORY = "QSAR/REGRESSION"
     OUTPUT_NODE = True
@@ -105,7 +106,7 @@ class Regression_Feature_Combination_Search:
                         top_results.sort(key=lambda x: x['R2'], reverse=True)
 
             if not top_results:
-                return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("",)}
+                return {"ui": {"text": "❌ No combinations were evaluated."}, "result": ("", "", "")}
                 
             best_per_size_df = pd.DataFrame(best_per_feature_count.values())
             best_per_size_path = os.path.join(output_dir, "Best_combination_per_size.csv")
@@ -120,6 +121,17 @@ class Regression_Feature_Combination_Search:
                 df_selected.to_csv(output_path, index=False)
                 if i == 1:
                     output_file = output_path
+
+            selected_features = best_overall_result["Best_Features"]
+            final_model = make_pipeline(StandardScaler(), LinearRegression())
+            final_model.fit(df[selected_features], y)
+
+            model_path = os.path.join(output_dir, "Combination_Regressor_LinearRegression.pkl")
+            joblib.dump(final_model, model_path)
+
+            descriptors_path = os.path.join(output_dir, "Combination_Selected_Descriptors.txt")
+            with open(descriptors_path, "w") as f:
+                f.write("\n".join(selected_features))
                     
             log_message = (
                 "========================================\n"
@@ -128,12 +140,17 @@ class Regression_Feature_Combination_Search:
                 f"🏆 Best CV R2: {best_overall_result['R2']:.4f}\n"
                 f"✨ Optimal Features ({best_overall_result['Num_Features']}): {best_overall_result['Best_Features']}\n"
                 f"💾 Output File: {os.path.basename(output_file)}\n"
+                f"💾 Model: {os.path.basename(model_path)}\n"
+                f"💾 Selected Descriptors: {os.path.basename(descriptors_path)}\n"
                 "========================================"
             )
-            return {"ui": {"text": log_message}, "result": (str(output_file),)}
+            return {
+                "ui": {"text": log_message},
+                "result": (str(output_file), str(model_path), str(descriptors_path))
+            }
             
         except Exception as e:
-            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("",)}
+            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("", "", "")}
 
 NODE_CLASS_MAPPINGS = {
     "Regression_Feature_Combination_Search": Regression_Feature_Combination_Search,
