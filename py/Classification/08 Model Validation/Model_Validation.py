@@ -71,7 +71,7 @@ class Model_Validation_Classification:
         }
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("EVALUATION_PATH", "PREDICTION_PATH")
+    RETURN_NAMES = ("MODEL", "SELECTED_DESCRIPTORS")
     FUNCTION = "validate_model"
     CATEGORY = "QSAR/CLASSIFICATION"
     OUTPUT_NODE = True
@@ -110,9 +110,18 @@ class Model_Validation_Classification:
                 f"💾 Prediction File: {os.path.basename(pred_path)}",
                 "========================================"
             ])
-            return {"ui": {"text": "\n".join(log_lines)}, "result": (str(eval_path), str(pred_path))}
+            return {
+                "ui": {"text": "\n".join(log_lines)},
+                "result": (
+                    str(model_path),
+                    str(selected_descriptors_path),
+                )
+            }
         except Exception as e:
-            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("", "")}
+            return {
+                "ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"},
+                "result": ("", "")
+            }
 
 NODE_CLASS_MAPPINGS = {
     "Model_Validation_Classification": Model_Validation_Classification,
