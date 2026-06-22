@@ -16,15 +16,15 @@ class QSARCustomUserScreener:
         return {
             "required": {
                 "input_sdf_path": ("STRING", {
-                    "default": "PTP1B_custom.sdf",
+                    "default": "",
                     "multiline": False,
                 }),
                 "model_path": ("STRING", {
-                    "default": "PTP1B_prediction_QSAR_model.pkl",
+                    "default": "",
                     "multiline": False,
                 }),
                 "features_path": ("STRING", {
-                    "default": "selected_features_V3.txt",
+                    "default": "",
                     "multiline": False,
                 }),
                 "threshold": ("FLOAT", {
@@ -42,20 +42,16 @@ class QSARCustomUserScreener:
                     "display": "number",
                 }),
                 "impute_method": (["mean", "median", "most_frequent"],),
-                "output_root_dir": ("STRING", {
-                    "default": "Custom_DB_Screening_Results",
-                    "multiline": False,
-                }),
             }
         }
 
     RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING")
     RETURN_NAMES = (
-        "standardized_sdf_path",
-        "descriptor_csv_path",
-        "preprocessed_csv_path",
-        "prediction_csv_path",
-        "selected_sdf_path",
+        "STANDARDIZED_MOLECULES",
+        "DESCRIPTORS",
+        "PREPROCESSED_DESCRIPTORS",
+        "SCREENING_RESULTS",
+        "SELECTED_MOLECULES",
     )
     FUNCTION = "execute"
     CATEGORY = "QSAR/SCREENER"
@@ -242,12 +238,11 @@ class QSARCustomUserScreener:
         threshold,
         nan_threshold,
         impute_method,
-        output_root_dir,
     ):
         input_sdf_path = self._resolve_path(input_sdf_path)
         model_path = self._resolve_path(model_path)
         features_path = self._resolve_path(features_path)
-        output_root = self._resolve_path(output_root_dir)
+        output_root = DEFAULT_OUTPUT_ROOT
 
         self._validate_file(input_sdf_path, "Input SDF")
         self._validate_file(model_path, "Model")
