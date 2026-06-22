@@ -118,7 +118,7 @@ After restart, look for these node categories in the node browser:
 
 ### Classification Workflow
 
-![Classification workflow example](https://github.com/DDUKHAE/ComfyQSAR/blob/main/example/Classification_workflow.png)
+![Classification workflow example](https://github.com/DDUKHAE/ComfyQSAR/blob/main/example/classification_workflow.png)
 
 ```
 1. Data Load & Standardization  →  2. Descriptor Calculation  →  3. Descriptor Preprocessing
