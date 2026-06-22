@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import traceback
 import folder_paths
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count
+from joblib import Parallel, delayed
 from lightgbm import LGBMRegressor
 
 def train_lightgbm_regression(args):
@@ -29,11 +30,11 @@ class LightGBMFeatureSelectionNode:
             "n_iterations": ("INT", {"default": 100, "min": 1, "max": 200, "step": 1}),
             "min_child_samples": ("INT", {"default": 20, "min": 1, "max": 100}),
             "min_split_gain": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-            "num_cores": ("INT", {"default": 4, "min": 1, "max": cpu_count(), "step": 1}),
+            "num_cores": ("INT", {"default": -1, "min": -1, "max": cpu_count(), "step": 1}),
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("output_file_path",)
     FUNCTION = "select_features"
     CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
@@ -51,8 +52,16 @@ class LightGBMFeatureSelectionNode:
             initial_feature_count = X.shape[1]
             args_list = [(X, y, i, n_estimators, max_depth, learning_rate, min_child_samples, min_split_gain)
                          for i in range(n_iterations)]
-            with Pool(num_cores) as pool:
-                results = pool.map(train_lightgbm_regression, args_list)
+            available_cores = -1 if num_cores == -1 else max(1, min(num_cores, cpu_count()))
+            cores_label = "-1 (all available cores)" if available_cores == -1 else str(available_cores)
+            results = Parallel(
+                n_jobs=available_cores,
+                backend="loky",
+                pre_dispatch="2*n_jobs",
+            )(
+                delayed(train_lightgbm_regression)(args)
+                for args in args_list
+            )
             feature_importances = np.mean(np.stack(results), axis=0)
             threshold_value = np.percentile(feature_importances, threshold_percentile)
             selected_indices = np.where(feature_importances >= threshold_value)[0]
@@ -74,7 +83,7 @@ class LightGBMFeatureSelectionNode:
                 f"📉 Selected Features: {final_feature_count}\n"
                 f"🗑️ Removed Features: {initial_feature_count - final_feature_count}\n"
                 f"⚙️ min_child_samples={min_child_samples}, min_split_gain={min_split_gain}\n"
-                f"🖥️ Parallel Cores: {num_cores}\n"
+                f"🖥️ Parallel Cores: {cores_label}\n"
                 f"💾 Output File: {os.path.basename(output_file)}\n"
                 "========================================"
             )
