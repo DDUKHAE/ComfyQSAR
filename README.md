@@ -4,8 +4,8 @@
 
 ![ComfyQSAR Logo](https://img.shields.io/badge/ComfyQSAR-QSAR%20Modeling-blue?style=for-the-badge)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
-[![ComfyUI 0.4.0](https://img.shields.io/badge/ComfyUI-0.4.0-green?style=flat-square)](https://github.com/comfyanonymous/ComfyUI)
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
+[![ComfyUI 0.25.0](https://img.shields.io/badge/ComfyUI-0.25.0-green?style=flat-square)](https://github.com/comfyanonymous/ComfyUI)
 
 **A Visual Node-Based QSAR Modeling Platform for ComfyUI**
 
@@ -73,7 +73,7 @@ Both Classification and Regression workflows follow the same 8-step pipeline:
 
 Two screening modes are available:
 
-- **QSAR DB Screener**: Screen 7 pre-computed compound databases instantly (no descriptor calculation needed)
+- **QSAR DB Screener**: Screen 7 pre-computed compound databases instantly
 - **Custom User Screener**: All-in-one node — standardize, calculate descriptors, preprocess, and screen your own SDF file
 
 ---
@@ -83,19 +83,23 @@ Two screening modes are available:
 ### Prerequisites
 
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI) installed
-- Python 3.10 or higher
-- Java Runtime Environment (JRE 11+) for PaDEL-Descriptor
+- Python 3.13 or higher
+- Java Runtime Environment (JRE 17+) for PaDEL-Descriptor
 
-### Method : Git Clone
+### Method : Git Clone + Conda Environment
 
 ```bash
 cd ComfyUI/custom_nodes
 git clone https://github.com/DDUKHAE/ComfyQSAR.git
 cd ComfyQSAR
+conda create -n comfyqsar python=3.13 -y
+conda activate comfyqsar
 pip install -r requirements.txt
 ```
 
-Restart ComfyUI.
+If you run ComfyUI in a separate environment, install the same packages there instead of creating a new environment.
+
+Restart ComfyUI after installation.
 
 
 ### Verify Installation
