@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import traceback
 import folder_paths
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count
+from joblib import Parallel, delayed
 from xgboost import XGBRegressor
 
 def train_xgb_importance_regression(args):
@@ -11,7 +12,7 @@ def train_xgb_importance_regression(args):
     model = XGBRegressor(
         n_estimators=params["n_estimators"], max_depth=params["max_depth"],
         learning_rate=params["learning_rate"], importance_type=params["importance_type"],
-        random_state=i, verbosity=0
+        random_state=i, verbosity=0, n_jobs=1
     )
     model.fit(X, y)
     return model.feature_importances_
@@ -28,11 +29,11 @@ class XGBoostFeatureSelectionNode:
             "max_depth": ("INT", {"default": 5, "min": 1, "max": 100, "step": 1}),
             "n_iterations": ("INT", {"default": 30, "min": 1, "max": 200, "step": 1}),
             "importance_type": (["gain", "weight", "cover", "total_gain", "total_cover"],),
-            "num_cores": ("INT", {"default": 4, "min": 1, "max": cpu_count(), "step": 1}),
+            "num_cores": ("INT", {"default": -1, "min": -1, "max": cpu_count(), "step": 1}),
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("output_file_path",)
     FUNCTION = "select_features"
     CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
@@ -52,8 +53,16 @@ class XGBoostFeatureSelectionNode:
             params = {"n_estimators": n_estimators, "max_depth": max_depth,
                       "learning_rate": learning_rate, "importance_type": importance_type}
             args_list = [(X, y, feature_names, i, params) for i in range(n_iterations)]
-            with Pool(num_cores) as pool:
-                importance_matrix = pool.map(train_xgb_importance_regression, args_list)
+            available_cores = -1 if num_cores == -1 else max(1, min(num_cores, cpu_count()))
+            cores_label = "-1 (all available cores)" if available_cores == -1 else str(available_cores)
+            importance_matrix = Parallel(
+                n_jobs=available_cores,
+                backend="loky",
+                pre_dispatch="2*n_jobs",
+            )(
+                delayed(train_xgb_importance_regression)(args)
+                for args in args_list
+            )
             feature_importances = np.mean(np.vstack(importance_matrix), axis=0)
             threshold_value = np.percentile(feature_importances, threshold_percentile)
             selected_indices = np.where(feature_importances >= threshold_value)[0]
@@ -74,7 +83,7 @@ class XGBoostFeatureSelectionNode:
                 f"📊 Initial Features: {initial_feature_count}\n"
                 f"📉 Selected Features: {final_feature_count}\n"
                 f"🗑️ Removed Features: {initial_feature_count - final_feature_count}\n"
-                f"🖥️ Parallel Cores: {num_cores}\n"
+                f"🖥️ Parallel Cores: {cores_label}\n"
                 f"💾 Output File: {os.path.basename(output_file)}\n"
                 "========================================"
             )
