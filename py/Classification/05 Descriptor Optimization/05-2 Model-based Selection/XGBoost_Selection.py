@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import folder_paths
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count
+from joblib import Parallel, delayed
 from xgboost import XGBClassifier
 
 def train_xgb_classification(args):
@@ -10,7 +11,7 @@ def train_xgb_classification(args):
     model = XGBClassifier(
         n_estimators=params["n_estimators"], max_depth=params["max_depth"],
         learning_rate=params["learning_rate"], use_label_encoder=False,
-        eval_metric="logloss", random_state=i, verbosity=0
+        eval_metric="logloss", random_state=i, verbosity=0, n_jobs=1
     )
     model.fit(X, y)
     return model.feature_importances_
@@ -28,7 +29,7 @@ class xgb_CL:
                 "threshold_mode": ("BOOLEAN", {"default": False, "forceInput": False, "label_on": "importance cutoff (%)", "label_off": "percentile"}),
                 "threshold": ("INT", {"default": 90, "min": 1, "max": 100, "step": 1}),
                 "n_iterations": ("INT", {"default": 30, "min": 1, "max": 200}),
-                "num_cores": ("INT", {"default": 4, "min": 1, "max": cpu_count(), "step": 1}),
+                "num_cores": ("INT", {"default": -1, "min": -1, "max": cpu_count(), "step": 1}),
             }
         }
 
@@ -49,11 +50,18 @@ class xgb_CL:
         y = df[target_column]
         feature_names = list(X.columns)
         initial_feature_count = len(feature_names)
-        available_cores = min(num_cores, cpu_count())
+        available_cores = -1 if num_cores == -1 else max(1, min(num_cores, cpu_count()))
+        cores_label = "-1 (all available cores)" if available_cores == -1 else str(available_cores)
         params = {"n_estimators": n_estimators, "max_depth": max_depth, "learning_rate": learning_rate}
         args_list = [(X, y, feature_names, i, params) for i in range(n_iterations)]
-        with Pool(available_cores) as pool:
-            importance_matrix = pool.map(train_xgb_classification, args_list)
+        importance_matrix = Parallel(
+            n_jobs=available_cores,
+            backend="loky",
+            pre_dispatch="2*n_jobs",
+        )(
+            delayed(train_xgb_classification)(args)
+            for args in args_list
+        )
         feature_importances = np.mean(np.vstack(importance_matrix), axis=0)
         if threshold_mode:
             importance_cutoff = threshold / 100.0
@@ -83,7 +91,7 @@ class xgb_CL:
             f"📉 Selected Features: {final_feature_count}\n"
             f"🗑️ Removed: {removed_features}\n"
             f"💾 Output File: {os.path.basename(output_file)}\n"
-            f"🖥️ Parallel Cores: {available_cores}\n"
+            f"🖥️ Parallel Cores: {cores_label}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}
