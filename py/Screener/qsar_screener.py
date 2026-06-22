@@ -44,11 +44,11 @@ class QSARDBScreener:
         return {
             "required": {
                 "model_path": ("STRING", {
-                    "default": "PTP1B_prediction_QSAR_model.pkl",
+                    "default": "",
                     "multiline": False,
                 }),
                 "features_path": ("STRING", {
-                    "default": "./selected_features_V3.txt",
+                    "default": "",
                     "multiline": False,
                 }),
                 "db_name": (list(SCREENING_DATABASES.keys()),),
@@ -63,7 +63,7 @@ class QSARDBScreener:
         }
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("csv_path", "sdf_path")
+    RETURN_NAMES = ("SCREENING_RESULTS", "SELECTED_MOLECULES")
     FUNCTION = "execute"
     CATEGORY = "QSAR/SCREENER"
     OUTPUT_NODE = True
