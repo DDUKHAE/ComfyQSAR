@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import folder_paths
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count
+from joblib import Parallel, delayed
 from lightgbm import LGBMClassifier
 
 def train_lightgbm_classification(args):
@@ -33,7 +34,7 @@ class lgb_CL:
                 "n_iterations": ("INT", {"default": 100, "min": 10, "max": 1000}),
                 "min_data_in_leaf": ("INT", {"default": 1, "min": 1, "max": 100}),
                 "min_split_gain": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "num_cores": ("INT", {"default": 6, "min": 1, "max": cpu_count(), "step": 1}),
+                "num_cores": ("INT", {"default": -1, "min": -1, "max": cpu_count(), "step": 1}),
             }
         }
 
@@ -55,12 +56,19 @@ class lgb_CL:
         y = df[target_column]
         feature_names = list(X.columns)
         initial_feature_count = len(feature_names)
-        available_cores = min(num_cores, cpu_count())
-        print(f"🖥️ Using {available_cores} CPU cores for parallel LightGBM training...")
+        available_cores = -1 if num_cores == -1 else max(1, min(num_cores, cpu_count()))
+        cores_label = "-1 (all available cores)" if available_cores == -1 else str(available_cores)
+        print(f"🖥️ Using {cores_label} for parallel LightGBM training...")
         args_list = [(X, y, feature_names, i, n_estimators, max_depth, learning_rate, min_data_in_leaf, min_split_gain)
                      for i in range(n_iterations)]
-        with Pool(available_cores) as pool:
-            results = pool.map(self._train_lightgbm, args_list)
+        results = Parallel(
+            n_jobs=available_cores,
+            backend="loky",
+            pre_dispatch="2*n_jobs",
+        )(
+            delayed(train_lightgbm_classification)(args)
+            for args in args_list
+        )
         feature_importance_matrix = np.stack(results)
         feature_importances = np.mean(feature_importance_matrix, axis=0)
         total_importance = feature_importances.sum()
@@ -96,7 +104,7 @@ class lgb_CL:
             f"💾 Output File: {os.path.basename(output_file)}\n"
             f"⚙️ min_data_in_leaf={min_data_in_leaf}, min_split_gain={min_split_gain}, "
             f"max_depth={max_depth}, lr={learning_rate}, n_estimators={n_estimators}\n"
-            f"🖥️ Parallel Cores: {available_cores}\n"
+            f"🖥️ Parallel Cores: {cores_label}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}
