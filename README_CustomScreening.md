@@ -44,12 +44,12 @@ All database files are in `ComfyQSAR/Screening_DB/`.
 
 ### Outputs
 
-| Name | Description |
+| Output | Description |
 |------|-------------|
-| CSV path | Predictions for all screened compounds |
-| SDF path | Selected compounds above threshold |
+| `SCREENING_RESULTS` | CSV containing compounds selected by the threshold |
+| `SELECTED_MOLECULES` | SDF containing the selected molecular structures |
 
-Results are saved to `ComfyQSAR/screening_results_DB/<db_name>/`.
+Results are saved to `ComfyUI/output/Screening/Database_Screening/<DB_NAME>/`.
 
 ### Example: PTP1B Screening with ASINEX
 
@@ -71,24 +71,25 @@ An all-in-one node that processes a custom SDF file through the complete screeni
 ### Inputs
 
 | Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `input_sdf_path` | STRING | `PTP1B_custom.sdf` | Input SDF file to screen |
-| `model_path` | STRING | `PTP1B_prediction_QSAR_model.pkl` | Trained QSAR model |
-| `features_path` | STRING | `selected_features_V3.txt` | Selected descriptor list |
-| `threshold` | FLOAT | 0.5 | Activity cutoff (0.0–1.0) |
-| `nan_threshold` | FLOAT | 0.5 | Max NaN fraction before removing a compound/descriptor |
-| `impute_method` | CHOICE | `mean` | Missing value imputation: `mean`, `median`, `most_frequent` |
-| `output_root_dir` | STRING | `Custom_DB_Screening_Results` | Output directory name |
+|---|---|---|---|
+| `input_sdf_path` | STRING | Empty | Input SDF file |
+| `model_path` | STRING | Empty | Trained QSAR model |
+| `features_path` | STRING | Empty | Selected descriptor list |
+| `threshold` | FLOAT | `0.5` | Prediction threshold |
+| `nan_threshold` | FLOAT | `0.5` | Maximum allowed NaN fraction |
+| `impute_method` | CHOICE | `mean` | Missing-value imputation method |
+
+The file path fields are intentionally empty by default.
 
 ### Outputs
 
-| Name | Description |
-|------|-------------|
-| `standardized_sdf_path` | Standardized SDF |
-| `descriptor_csv_path` | Raw PaDEL descriptors |
-| `preprocessed_csv_path` | Preprocessed descriptors |
-| `prediction_csv_path` | Screening predictions CSV |
-| `selected_sdf_path` | Selected compounds SDF |
+| Output | Description |
+|---|---|
+| `STANDARDIZED_MOLECULES` | Standardized SDF |
+| `DESCRIPTORS` | Raw PaDEL descriptor CSV |
+| `PREPROCESSED_DESCRIPTORS` | Preprocessed descriptor CSV |
+| `SCREENING_RESULTS` | Screening prediction CSV |
+| `SELECTED_MOLECULES` | Selected-compound SDF |
 
 ### Internal Pipeline
 
@@ -119,12 +120,14 @@ Output CSV + SDF
 ### Output File Structure
 
 ```
-ComfyQSAR/py/Screener/Custom_DB_Screening_Results/
-├── standardized_input.sdf
-├── molecular_descriptors.csv
-├── preprocessed_data.csv
-├── Custom_Screening_Predictions.csv
-└── Custom_Screening_Selected_Molecules.sdf
+ComfyUI/output/Screening/Custom_Screening/
+├── custom_db_prepared/
+│   ├── standardized_input.sdf
+│   ├── molecular_descriptors.csv
+│   └── preprocessed_data.csv
+└── custom_screening_results/
+    ├── User_Screening_Predictions.csv
+    └── User_Screening_Selected_Molecules.sdf
 ```
 
 ### Example: Screening a Custom SDF
@@ -151,8 +154,15 @@ ComfyQSAR/py/Screener/Custom_DB_Screening_Results/
 
 After completing the 8-step training pipeline:
 
-1. The trained model is saved as `ComfyUI/output/QSAR_GridSearch/Best_Classifier_<model>.pkl`
-2. The feature list is saved as `ComfyUI/output/QSAR_GridSearch/Final_Selected_Descriptors.txt`
+Classification:
+
+- `ComfyUI/output/Classification/07_Model_Training/Best_Classifier_<model>.pkl`
+- `ComfyUI/output/Classification/07_Model_Training/Final_Selected_Descriptors.txt`
+
+Regression:
+
+- `ComfyUI/output/Regression/07_Model_Training/Best_Regressor_<model>.pkl`
+- `ComfyUI/output/Regression/07_Model_Training/Final_Descriptors.txt`
 
 Use these paths in either screening node.
 
