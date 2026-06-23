@@ -269,7 +269,7 @@ Searches combinations of multiple descriptor sets to find the optimal subset.
 
 **Parameters:** Select algorithm and provide parameter lists as Python list strings (e.g., `[100, 200, 300]`).
 
-**Output files** (saved to `ComfyUI/output/QSAR_GridSearch/`):
+**Output files** (saved to `ComfyUI/output/Classification/07_Model_Training/`):
 
 - `Best_Classifier_<model>.pkl` — trained model
 - `Final_Selected_Descriptors.txt` — selected feature names
@@ -286,7 +286,7 @@ Searches combinations of multiple descriptor sets to find the optimal subset.
 
 **Inputs**: model `.pkl`, `selected_descriptors.txt`, `X_test.csv`, `y_test.csv`
 
-**Output files**:
+**Output files** (saved to `ComfyUI/output/Classification/08_Model_Validation/`):
 
 - `Evaluation_Results_ExternalTestSet.csv` — Accuracy, F1, ROC-AUC, Precision, Recall, Specificity
 - `Actual_vs_Predicted.csv` — per-compound predictions
@@ -318,20 +318,37 @@ See [README_CustomScreening.md](README_CustomScreening.md) for details.
 
 ```
 ComfyUI/output/
-├── QSAR_GridSearch/               # Classification training outputs
-│   ├── Best_Classifier_RF.pkl
-│   ├── Final_Selected_Descriptors.txt
-│   ├── Best_Hyperparameters_RF.txt
-│   ├── X_test.csv
-│   └── y_test.csv
-├── QSAR_GridSearch_Regression/    # Regression training outputs
-│   └── (same structure)
-└── QSAR_ModelValidation/          # Validation results
-    ├── Evaluation_Results_ExternalTestSet.csv
-    └── Actual_vs_Predicted.csv
-
-ComfyQSAR/screening_results_DB/    # DB screener results
-ComfyQSAR/py/Screener/Custom_DB_Screening_Results/  # Custom screener results
+├── Classification/
+│   ├── 01_Data_Load_and_Standardization/
+│   ├── 02_Descriptor_Calculation/
+│   ├── 03_Descriptor_Preprocessing/
+│   ├── 04_Data_Split/
+│   ├── 05_Descriptor_Optimization/
+│   │   ├── Filter_Based/
+│   │   └── Model_Based/
+│   ├── 06_Descriptor_Combination/
+│   ├── 07_Model_Training/
+│   └── 08_Model_Validation/
+├── Regression/
+│   ├── 01_Data_Load_and_Standardization/
+│   ├── 02_Descriptor_Calculation/
+│   ├── 03_Descriptor_Preprocessing/
+│   ├── 04_Data_Split/
+│   ├── 05_Descriptor_Optimization/
+│   │   ├── Filter_Based/
+│   │   └── Model_Based/
+│   ├── 06_Descriptor_Combination/
+│   ├── 07_Model_Training/
+│   └── 08_Model_Validation/
+└── Screening/
+    ├── Database_Screening/
+    │   └── <DB_NAME>/
+    │       ├── <DB_NAME>_Screening_Selected_Compounds.csv
+    │       └── SDF/
+    │           └── <DB_NAME>_Selected_Molecules.sdf
+    └── Custom_Screening/
+        ├── custom_db_prepared/
+        └── custom_screening_results/
 ```
 
 ---
