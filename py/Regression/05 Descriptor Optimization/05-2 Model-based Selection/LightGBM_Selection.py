@@ -34,7 +34,7 @@ class LightGBMFeatureSelectionNode:
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("output_file_path",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
     FUNCTION = "select_features"
     CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
