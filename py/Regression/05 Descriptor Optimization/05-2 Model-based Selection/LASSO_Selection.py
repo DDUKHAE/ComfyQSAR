@@ -9,26 +9,26 @@ class LassoFeatureSelectionNode:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "input_file_path": ("STRING", {"forceInput": True}),
+            "descriptor_data_path": ("STRING", {"forceInput": True, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "target_column": ("STRING", {"default": "value"}),
             "alpha": ("FLOAT", {"default": 0.01, "min": 0.0001, "max": 10.0, "step": 0.001}),
             "max_iter": ("INT", {"default": 1000, "min": 100, "max": 10000, "step": 100}),
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "select_features"
-    CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/2. REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def select_features(self, input_file_path, target_column, alpha, max_iter):
+    def select_features(self, descriptor_data_path, target_column, alpha, max_iter):
         try:
             output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
             os.makedirs(output_dir, exist_ok=True)
-            df = pd.read_csv(input_file_path)
+            df = pd.read_csv(descriptor_data_path)
             if target_column not in df.columns:
                 raise ValueError(f"Target column '{target_column}' not found.")
-            X = df.drop(columns=[target_column]).select_dtypes(include=[np.number])
+            X = df.drop(columns=[c for c in (target_column, "Name", "SMILES") if c in df.columns]).select_dtypes(include=[np.number])
             y = df[target_column]
             initial_feature_count = X.shape[1]
             model = Lasso(alpha=alpha, max_iter=max_iter)
@@ -52,7 +52,8 @@ class LassoFeatureSelectionNode:
                 f"📊 Initial Features: {initial_feature_count}\n"
                 f"📉 Selected Features: {final_feature_count}\n"
                 f"🗑️ Removed Features: {initial_feature_count - final_feature_count}\n"
-                f"💾 Output File: {os.path.basename(output_file)}\n"
+                f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+                f"💾 Output: {os.path.basename(output_file)}\n"
                 "========================================"
             )
             return {"ui": {"text": log_message}, "result": (str(output_file),)}

@@ -1,19 +1,22 @@
 import os
+import sys
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import SDWriter
+from rdkit.Chem import SDWriter, AllChem
 import folder_paths
 import traceback
 from typing import List, Tuple, Dict, Any, Optional
 
-METAL_IONS = {
-    'Li', 'Be', 'Na', 'Mg', 'Al', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn',
-    'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'Rb', 'Sr', 'Y', 'Zr', 'Nb',
-    'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Cs', 'Ba',
-    'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er',
-    'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',
-    'Tl', 'Pb', 'Bi', 'Th', 'Pa', 'U'
-}
+# standardize_mol lives in code/py/_shared/ -- the ONE module shared across
+# tracks/nodes in this codebase, because training (here) and screening
+# (Screener/custom_user_screener.py) must standardize molecules identically
+# or the same physical compound could be represented differently (or
+# dropped by one path and not the other) depending on which stage sees it.
+_PY_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_SHARED_DIR = os.path.join(_PY_DIR, "_shared")
+if _SHARED_DIR not in sys.path:
+    sys.path.insert(0, _SHARED_DIR)
+from chem_standardize import standardize_mol  # noqa: E402
 
 CLASSIFICATION_SUPPORTED_EXTENSIONS = ('.smi', '.csv', '.sdf')
 
@@ -30,12 +33,19 @@ def read_molecules(file_path: str) -> List[Optional[Chem.Mol]]:
         return [mol for mol in suppl if mol is not None]
     elif file_path.endswith(('.smi', '.csv')):
         try:
-            df = pd.read_csv(file_path, skip_blank_lines=True)
-            smiles_col = next((col for col in df.columns if 'smiles' in col.lower()), None)
-            if smiles_col:
-                df.rename(columns={smiles_col: 'SMILES'}, inplace=True)
+            if file_path.endswith('.smi'):
+                # .smi files are headerless (one SMILES per line) -- reading
+                # with the default header='infer' silently drops the first
+                # compound by mistaking it for a column name.
+                df = pd.read_csv(file_path, header=None, skip_blank_lines=True)
+                df.columns = ['SMILES']
             else:
-                df.rename(columns={df.columns[0]: 'SMILES'}, inplace=True)
+                df = pd.read_csv(file_path, skip_blank_lines=True)
+                smiles_col = next((col for col in df.columns if 'smiles' in col.lower()), None)
+                if smiles_col:
+                    df.rename(columns={smiles_col: 'SMILES'}, inplace=True)
+                else:
+                    df.rename(columns={df.columns[0]: 'SMILES'}, inplace=True)
         except Exception as e:
             raise IOError(f"Failed to read CSV/SMI file {os.path.basename(file_path)}: {e}")
         mols = []
@@ -52,6 +62,8 @@ def write_molecules(mols: List[Chem.Mol], output_path: str) -> None:
         with SDWriter(output_path) as writer:
             for mol in mols:
                 if mol is not None:
+                    if mol.GetNumConformers() == 0:
+                        AllChem.Compute2DCoords(mol)
                     writer.write(mol)
     elif output_path.endswith('.csv'):
         smiles_list = [Chem.MolToSmiles(mol) for mol in mols]
@@ -59,16 +71,6 @@ def write_molecules(mols: List[Chem.Mol], output_path: str) -> None:
     else:
         raise ValueError(f"Unsupported output format for {output_path}")
 
-
-def filter_molecule(mol: Optional[Chem.Mol]) -> bool:
-    if mol is None:
-        return False
-    atom_symbols = {atom.GetSymbol() for atom in mol.GetAtoms()}
-    if atom_symbols and atom_symbols.issubset(METAL_IONS):
-        return False
-    if len(Chem.GetMolFrags(mol)) > 1:
-        return False
-    return True
 
 class Data_Loader_Classification:
     @classmethod
@@ -81,9 +83,9 @@ class Data_Loader_Classification:
         }
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("POSITIVE", "NEGATIVE")
+    RETURN_NAMES = ("LOADED_POSITIVE", "LOADED_NEGATIVE")
     FUNCTION = "load_data"
-    CATEGORY = "QSAR/CLASSIFICATION/OTHERS"
+    CATEGORY = "QSAR/1. CLASSIFICATION/OTHERS"
     OUTPUT_NODE = True
 
     def load_data(self, positive_file_path: str, negative_file_path: str) -> Dict[str, Any]:
@@ -99,9 +101,9 @@ class Data_Loader_Classification:
                 "========================================\n"
                 "🔹 Classification Data Loaded! 🔹\n"
                 "========================================\n"
-                f"✅ Positive Compounds: {pos_count+1}\n"
-                f"✅ Negative Compounds: {neg_count+1}\n"
-                f"📊 Total: {total_count+2} molecules\n"
+                f"✅ Positive Compounds: {pos_count}\n"
+                f"✅ Negative Compounds: {neg_count}\n"
+                f"📊 Total: {total_count} molecules\n"
                 "========================================"
             )
             return {"ui": {"text": log_message}, "result": (positive_file_path, negative_file_path)}
@@ -122,40 +124,112 @@ class Standardization_Classification:
         }
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("POSITIVE_STD", "NEGATIVE_STD")
+    RETURN_NAMES = ("STANDARDIZED_POSITIVE", "STANDARDIZED_NEGATIVE")
     FUNCTION = "standardize_data"
-    CATEGORY = "QSAR/CLASSIFICATION/OTHERS"
+    CATEGORY = "QSAR/1. CLASSIFICATION/OTHERS"
     OUTPUT_NODE = True
 
     def standardize_data(self, positive_path: str, negative_path: str) -> Dict[str, Any]:
         output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "01_Data_Load_and_Standardization")
         os.makedirs(output_dir, exist_ok=True)
 
-        def process_and_standardize(file_path: str, output_name: str) -> Tuple[str, int]:
+        def process_and_standardize(file_path: str, output_name: str) -> Dict[str, Any]:
             ext = '.sdf' if file_path.endswith('.sdf') else '.csv'
             output_file = os.path.join(output_dir, f"{output_name}_standardized{ext}")
+            report_file = os.path.join(output_dir, f"{output_name}_standardization_report.csv")
+
             mols = read_molecules(file_path)
-            filtered_mols = [mol for mol in mols if filter_molecule(mol)]
-            write_molecules(filtered_mols, output_file)
-            return output_file, len(filtered_mols)
+            stats = {"rejected_unparseable": 0, "rejected_metal": 0, "rejected_empty": 0,
+                     "fragment_changed": 0, "charge_changed": 0, "tautomer_changed": 0}
+            report_rows = []
+            standardized_mols = []
+
+            for mol in mols:
+                original_smiles = Chem.MolToSmiles(mol) if mol is not None else None
+                std_mol, info = standardize_mol(mol)
+
+                if info["status"] == "rejected":
+                    key = {"unparseable": "rejected_unparseable",
+                           "metal_only": "rejected_metal"}.get(info["reason"], "rejected_empty")
+                    stats[key] += 1
+                    report_rows.append({
+                        "original_smiles": original_smiles, "standardized_smiles": "",
+                        "status": "rejected", "reason": info["reason"], "changed": False,
+                        "fragment_changed": False, "charge_changed": False, "tautomer_changed": False,
+                    })
+                    continue
+
+                stats["fragment_changed"] += int(info["fragment_changed"])
+                stats["charge_changed"] += int(info["charge_changed"])
+                stats["tautomer_changed"] += int(info["tautomer_changed"])
+                standardized_smiles = Chem.MolToSmiles(std_mol)
+                report_rows.append({
+                    "original_smiles": original_smiles, "standardized_smiles": standardized_smiles,
+                    "status": "ok", "reason": "",
+                    "changed": info["fragment_changed"] or info["charge_changed"] or info["tautomer_changed"],
+                    "fragment_changed": info["fragment_changed"],
+                    "charge_changed": info["charge_changed"], "tautomer_changed": info["tautomer_changed"],
+                })
+                standardized_mols.append(std_mol)
+
+            write_molecules(standardized_mols, output_file)
+            pd.DataFrame(report_rows).to_csv(report_file, index=False)
+
+            smiles_list = [Chem.MolToSmiles(m) for m in standardized_mols]
+            n_duplicates = int(pd.Series(smiles_list).duplicated().sum()) if smiles_list else 0
+
+            return {
+                "output_file": output_file, "report_file": report_file,
+                "kept_count": len(standardized_mols), "stats": stats, "n_duplicates": n_duplicates,
+            }
 
         try:
-            positive_output, pos_count = process_and_standardize(positive_path, "positive")
-            negative_output, neg_count = process_and_standardize(negative_path, "negative")
+            pos = process_and_standardize(positive_path, "positive")
+            neg = process_and_standardize(negative_path, "negative")
 
+            def fmt_block(label: str, r: Dict[str, Any]) -> str:
+                # Only surface a sub-line when that category actually has a
+                # nonzero count -- a clean run should read as one short line,
+                # not a wall of "0" breakdowns the user has to scan past.
+                s = r["stats"]
+                n_rejected = s["rejected_unparseable"] + s["rejected_metal"] + s["rejected_empty"]
+                n_changed = s["fragment_changed"] + s["charge_changed"] + s["tautomer_changed"]
+                initial = r["kept_count"] + n_rejected
+                lines = [f"{label}: {r['kept_count']}/{initial} kept"]
+                if n_rejected:
+                    parts = [f"{name} {v}" for name, v in (
+                        ("unparseable", s["rejected_unparseable"]),
+                        ("metal-only", s["rejected_metal"]),
+                        ("empty-after-standardization", s["rejected_empty"]),
+                    ) if v]
+                    lines.append(f"   ⚠️  Rejected {n_rejected}: {', '.join(parts)}")
+                if n_changed:
+                    parts = [f"{name} {v}" for name, v in (
+                        ("fragment/salt", s["fragment_changed"]),
+                        ("charge", s["charge_changed"]),
+                        ("tautomer", s["tautomer_changed"]),
+                    ) if v]
+                    lines.append(f"   🧪 Changed {n_changed}: {', '.join(parts)}")
+                if r["n_duplicates"]:
+                    lines.append(f"   ⚠️  {r['n_duplicates']} duplicate SMILES kept (not removed)")
+                return "\n".join(lines) + "\n"
+
+            rel_dir = os.path.relpath(output_dir, folder_paths.get_output_directory())
             log_message = (
                 "========================================\n"
                 "🔹 Standardization Completed! 🔹\n"
                 "========================================\n"
-                f"✅ Positive Standardized: {pos_count+1}\n"
-                f"✅ Negative Standardized: {neg_count+1}\n"
-                f"💾 Output Dir: `{os.path.abspath(output_dir)}`\n"
+                f"{fmt_block('✅ Positive', pos)}"
+                f"{fmt_block('✅ Negative', neg)}"
+                f"📁 Directory: {rel_dir}{os.sep}\n"
+                f"💾 Outputs: {os.path.basename(pos['output_file'])}, {os.path.basename(neg['output_file'])}\n"
+                f"📋 Reports: {os.path.basename(pos['report_file'])}, {os.path.basename(neg['report_file'])}\n"
                 "========================================"
             )
-            return {"ui": {"text": log_message}, "result": (positive_output, negative_output)}
+            return {"ui": {"text": log_message}, "result": (pos["output_file"], neg["output_file"])}
 
         except Exception as e:
-            error_msg = f"❌ Standardization Error: {e}"
+            error_msg = f"❌ Standardization Error: {e}\n{traceback.format_exc()}"
             return {"ui": {"text": error_msg}, "result": ("", "")}
 
 
@@ -172,9 +246,9 @@ class Load_and_Standardize_Classification:
         }
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("POSITIVE_STD", "NEGATIVE_STD")
+    RETURN_NAMES = ("STANDARDIZED_POSITIVE", "STANDARDIZED_NEGATIVE")
     FUNCTION = "run"
-    CATEGORY = "QSAR/CLASSIFICATION"
+    CATEGORY = "QSAR/1. CLASSIFICATION"
     OUTPUT_NODE = True
 
     def run(self, positive_file_path: str, negative_file_path: str) -> Dict[str, Any]:

@@ -10,23 +10,23 @@ class Remove_Low_Variance_Descriptors_Regression:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "input_file": ("STRING", {"forceInput": False}),
+            "descriptor_data_path": ("STRING", {"forceInput": False, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "threshold": ("FLOAT", {"default": 0.05, "min": 0.0, "max": 1.0, "step": 0.01}),
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("LOW_VARIANCE_DESCRIPTORS",)
+    RETURN_NAMES = ("VARIANCE_FILTERED_DATA",)
     FUNCTION = "run"
-    CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.1 Filter-based Selection"
+    CATEGORY = "QSAR/2. REGRESSION/5. Descriptor Optimization/5.1 Filter-based Selection"
     OUTPUT_NODE = True
 
-    def run(self, input_file, threshold):
+    def run(self, descriptor_data_path, threshold):
         output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if "value" not in df.columns:
             raise ValueError("The dataset must contain a 'value' column.")
-        df = df.drop("Name", axis=1, errors='ignore')
+        df = df.drop(columns=["Name", "SMILES"], errors='ignore')
         target_column = df["value"]
         feature_columns = df.drop(columns=["value"])
         selector = VarianceThreshold(threshold=threshold)
@@ -45,7 +45,8 @@ class Remove_Low_Variance_Descriptors_Regression:
             f"📊 Initial Features: {initial_count}\n"
             f"📉 Remaining Features: {final_count}\n"
             f"🗑️ Removed: {initial_count - final_count}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}
@@ -54,19 +55,19 @@ class Remove_High_Correlation_Features_Regression:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "input_file": ("STRING", {"forceInput": False}),
+            "descriptor_data_path": ("STRING", {"forceInput": False, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "threshold": ("FLOAT", {"default": 0.95, "min": 0.5, "max": 1.0, "step": 0.01}),
             "correlation_mode": (["target_based", "upper", "lower"], {"default": "target_based"}),
             "importance_model": (["lasso", "random_forest"], {"default": "lasso"}),
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("OPTIMIZED_DESCRIPTORS",)
+    RETURN_NAMES = ("OPTIMIZED_DESCRIPTOR_DATA",)
     FUNCTION = "run"
-    CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.1 Filter-based Selection"
+    CATEGORY = "QSAR/2. REGRESSION/5. Descriptor Optimization/5.1 Filter-based Selection"
     OUTPUT_NODE = True
 
-    def run(self, input_file, threshold, correlation_mode, importance_model):
+    def run(self, descriptor_data_path, threshold, correlation_mode, importance_model):
         try:
             threshold = float(threshold)
         except (TypeError, ValueError):
@@ -76,10 +77,10 @@ class Remove_High_Correlation_Features_Regression:
 
         output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if "value" not in df.columns:
             raise ValueError("The dataset must contain a 'value' column.")
-        df = df.drop("Name", axis=1, errors='ignore')
+        df = df.drop(columns=["Name", "SMILES"], errors='ignore')
         target_column = df["value"]
         feature_columns = df.drop(columns=["value"])
         correlation_matrix = feature_columns.corr()
@@ -125,7 +126,8 @@ class Remove_High_Correlation_Features_Regression:
             f"📊 Initial Features: {initial_count}\n"
             f"📉 Remaining Features: {final_count}\n"
             f"🗑️ Removed: {initial_count - final_count}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}
@@ -134,7 +136,7 @@ class Descriptor_Optimization_Regression:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "input_file": ("STRING", {"forceInput": False}),
+            "descriptor_data_path": ("STRING", {"forceInput": False, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "variance_threshold": ("FLOAT", {"default": 0.05, "min": 0.0, "max": 1.0, "step": 0.01}),
             "correlation_threshold": ("FLOAT", {"default": 0.95, "min": 0.5, "max": 1.0, "step": 0.01}),
             "correlation_mode": (["target_based", "upper", "lower"], {"default": "target_based"}),
@@ -142,18 +144,18 @@ class Descriptor_Optimization_Regression:
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("OPTIMIZED_DESCRIPTORS",)
+    RETURN_NAMES = ("OPTIMIZED_DESCRIPTOR_DATA",)
     FUNCTION = "run"
-    CATEGORY = "QSAR/REGRESSION/OTHERS"
+    CATEGORY = "QSAR/2. REGRESSION/OTHERS"
     OUTPUT_NODE = True
 
-    def run(self, input_file, variance_threshold, correlation_threshold, correlation_mode, importance_model):
+    def run(self, descriptor_data_path, variance_threshold, correlation_threshold, correlation_mode, importance_model):
         output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Filter_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if "value" not in df.columns:
             raise ValueError("The dataset must contain a 'value' column.")
-        df = df.drop("Name", axis=1, errors='ignore')
+        df = df.drop(columns=["Name", "SMILES"], errors='ignore')
         target_column = df["value"]
         feature_columns = df.drop(columns=["value"])
         initial_count = feature_columns.shape[1]
@@ -203,7 +205,8 @@ class Descriptor_Optimization_Regression:
             f"🗑️ Removed by Variance: {initial_count - count_after_var}\n"
             f"🗑️ Removed by Correlation: {count_after_var - final_count}\n"
             f"📉 Final Features: {final_count}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}

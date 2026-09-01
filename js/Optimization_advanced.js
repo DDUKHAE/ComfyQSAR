@@ -13,18 +13,15 @@ function getCorrelationModeParameters(correlationMode) {
   return parameterMappings[correlationMode] || [];
 }
 
-// importance_model별 파라미터 매핑
-function getImportanceModelParameters(importanceModel) {
-  const parameterMappings = {
-    lasso: ["alpha", "max_iter"],
-    random_forest: ["n_estimators"],
-  };
-  return parameterMappings[importanceModel] || [];
+// importance_model별 파라미터 매핑 (alpha/max_iter/n_estimators는 노드에서
+// 위젯으로 노출되지 않고 내부 고정값이라 매핑할 대상이 없음)
+function getImportanceModelParameters(_importanceModel) {
+  return [];
 }
 
 // 모든 조건부 파라미터 목록
 function getAllConditionalParams() {
-  return ["importance_model", "alpha", "max_iter", "n_estimators"];
+  return ["importance_model"];
 }
 
 // 손상되거나 이전 형식으로 저장된 workflow 위젯 값 복구
@@ -261,13 +258,6 @@ app.registerExtension({
               if (paramName === "importance_model") {
                 // importance_model은 correlation_mode가 target_based일 때만 표시
                 shouldShow = correlationMode === "target_based";
-              } else if (
-                ["alpha", "max_iter", "n_estimators"].includes(paramName)
-              ) {
-                // 이 파라미터들은 correlation_mode가 target_based이고 해당 importance_model에 속할 때만 표시
-                shouldShow =
-                  correlationMode === "target_based" &&
-                  importanceParams.includes(paramName);
               }
 
               console.log(

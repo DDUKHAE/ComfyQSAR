@@ -1,0 +1,3 @@
+Num_Features,Feature_Indices,Best_Features,R2
+2,"(14, 16)","['SHCsats', 'minsssCH']",0.1920745721366756
+3,"(14, 16, 18)","['SHCsats', 'minsssCH', 'maxaaCH']",0.23577598320390852

@@ -10,13 +10,11 @@ const TARGET_NODES = Object.freeze([
   "Standardization_Classification",
   "Load_and_Standardize_Classification",
 
-  // Descriptor Calculations
+  // Descriptor Calculations (sanitization merged into this node)
   "Descriptor_Calculations_Regression",
   "Descriptor_Calculations_Classification",
 
   // Descriptor Preprocessing
-  "Replace_inf_with_nan_Regression",
-  "Replace_inf_with_nan_Classification",
   "Remove_high_nan_compounds_Regression",
   "Remove_high_nan_compounds_Classification",
   "Remove_high_nan_descriptors_Regression",
@@ -25,6 +23,8 @@ const TARGET_NODES = Object.freeze([
   "Impute_missing_values_Classification",
   "Descriptor_preprocessing_Regression",
   "Descriptor_preprocessing_Classification",
+  "Paired_Descriptor_Preprocessing_Regression",
+  "Paired_Descriptor_Preprocessing_Classification",
 
   // Data Split
   "QSARDataSplit_Regression",
@@ -67,6 +67,14 @@ const TARGET_NODES = Object.freeze([
   // Model Validation
   "Model_Validation_Regression",
   "Model_Validation_Classification",
+  "YScramblingValidation_Regression",
+  "YScramblingValidation_Classification",
+  "ResamplingValidation_Regression",
+  "ResamplingValidation_Classification",
+  "ApplicabilityDomain_Regression",
+  "ApplicabilityDomain_Classification",
+  "ScreeningCandidateAD_Regression",
+  "ScreeningCandidateAD_Classification",
 
   // Screener
   "QSARDBScreener",

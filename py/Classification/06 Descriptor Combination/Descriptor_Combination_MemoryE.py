@@ -48,34 +48,65 @@ class Feature_Combination_Search:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "input_file": ("STRING", {"default": ""}),
-                "max_features": ("INT", {"default": 5, "min": 1, "step": 1}),
-                "num_cores": ("INT", {"default": -1, "max": multiprocessing.cpu_count(), "min": -1, "step": 1}),
+                "optimized_descriptor_path": ("STRING", {"default": "", "tooltip": "From 5. This node is optional -- 5 can connect straight to 7."}),
+                "max_features": ("INT", {"default": 3, "min": 1, "step": 1}),
+                "num_cores": ("INT", {"default": 1, "max": multiprocessing.cpu_count(), "min": -1, "step": 1,
+                                       "tooltip": "1 (default) runs in-process with no worker-pool startup cost -- "
+                                                  "recommended for typical QSAR-sized searches, where loky's "
+                                                  "per-worker boot/unpickle overhead outweighs any speedup. Only "
+                                                  "raise this for genuinely large combination counts."}),
                 "top_n": ("INT", {"default": 3, "min": 1, "step": 1}),
                 "chunk_size": ("INT", {"default": 2000, "min": 1}),
             }
         }
 
     RETURN_TYPES = ("STRING", "STRING", "STRING")
-    RETURN_NAMES = ("OPTIMAL_FEATURE_SET", "MODEL", "SELECTED_DESCRIPTORS")
+    RETURN_NAMES = ("OPTIMAL_DESCRIPTOR_DATA", "BASELINE_MODEL", "SELECTED_DESCRIPTOR_LIST")
     FUNCTION = "descriptor_combination_classification_MemoryE"
-    CATEGORY = "QSAR/CLASSIFICATION"
+    CATEGORY = "QSAR/1. CLASSIFICATION"
     OUTPUT_NODE = True
 
-    def descriptor_combination_classification_MemoryE(self, input_file, max_features, num_cores, top_n, chunk_size):
+    def descriptor_combination_classification_MemoryE(self, optimized_descriptor_path, max_features, num_cores, top_n, chunk_size):
         try:
             output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "06_Descriptor_Combination")
             os.makedirs(output_dir, exist_ok=True)
-            df = pd.read_csv(input_file)
+            df = pd.read_csv(optimized_descriptor_path)
 
             if "Label" not in df.columns:
                 raise ValueError("Target column 'Label' not found in the dataset.")
 
-            X = df.drop(columns=["Label"]).to_numpy()
+            metadata_cols = [c for c in ("Name", "SMILES", "Label") if c in df.columns]
+            X = df.drop(columns=metadata_cols).to_numpy()
             y = df["Label"].to_numpy()
-            feature_names = df.drop(columns=["Label"]).columns.tolist()
+            feature_names = df.drop(columns=metadata_cols).columns.tolist()
 
-            cores = -1 if num_cores == -1 else max(1, min(num_cores, multiprocessing.cpu_count()))
+            cpu_count = multiprocessing.cpu_count()
+            total_combs = sum(
+                comb(X.shape[1], nf)
+                for nf in range(2, min(max_features + 1, len(feature_names) + 1))
+            )
+            # A handful of combinations finishes in well under a second running
+            # in-process; a loky worker pool costs multiple seconds per worker
+            # just to boot and unpickle the task, so parallelizing a small
+            # search is a net slowdown, not a speedup -- force serial
+            # execution regardless of the user's num_cores setting.
+            force_serial = total_combs < 16
+            if force_serial:
+                cores = 1
+            elif num_cores == -1:
+                cores = cpu_count
+            else:
+                cores = max(1, min(num_cores, cpu_count))
+
+            cores_warning = ""
+            if num_cores == -1 and cpu_count > 8 and not force_serial:
+                cores_warning = (
+                    f"⚠️ num_cores=-1 requests all {cpu_count} CPU cores -- for typical "
+                    "QSAR-sized searches, per-worker startup overhead can make this "
+                    "slower than a small explicit core count (e.g. 2-4). Consider "
+                    "setting num_cores explicitly if this run feels slow.\n"
+                )
+
             top_results = []
             best_per_feature_count = {}
 
@@ -150,8 +181,12 @@ class Feature_Combination_Search:
                 "========================================\n"
                 "🔹 Feature Combination Search (Memory Efficient) Completed! 🔹\n"
                 "========================================\n"
+                f"🖥️ Requested cores: {num_cores}, Effective cores: {cores} (CPU count: {cpu_count})\n"
+                f"📊 Total combinations evaluated: {total_combs}\n"
+                f"{cores_warning}"
                 f"🏆 Best CV Accuracy: {best_overall_result['Accuracy']:.4f}\n"
                 f"✨ Optimal Features ({best_overall_result['Num_Features']}): {best_overall_result['Best_Features']}\n"
+                f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
                 f"💾 Top Ranked Set: {os.path.basename(output_file)}\n"
                 f"💾 Model: {os.path.basename(model_path)}\n"
                 f"💾 Selected Descriptors: {os.path.basename(descriptors_path)}\n"

@@ -1,0 +1,2 @@
+test_scope,selection_metric,n_train,real_cv_score,mean_permuted_score,std_permuted_score,n_permutations,cv_splits,random_state,p_value
+fixed_descriptor_set,accuracy,673,0.8648313985627418,0.7901355444997236,0.000987393027764136,100,5,42,0.009900990099009901

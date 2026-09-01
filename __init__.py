@@ -59,8 +59,8 @@ _CL = "Classification"
 
 _load(f"{_CL}/01 Data Load & Standardization/Data_Load_and_Standardization.py")
 _load(f"{_CL}/02 Descriptor Calculation/Descriptor_Calculation.py")
-_load(f"{_CL}/03 Descriptor Preprocessing/Descriptor_Preprocessing.py")
-_load(f"{_CL}/04 Data Split/Data_Split.py")
+_load(f"{_CL}/03 Data Split/Data_Split.py")
+_load(f"{_CL}/04 Descriptor Preprocessing/Descriptor_Preprocessing.py")
 _load(f"{_CL}/05 Descriptor Optimization/05-1 Filter-based Selection/Filter_Based_Selection.py")
 _load(f"{_CL}/05 Descriptor Optimization/05-2 Model-based Selection/LASSO_Selection.py")
 _load(f"{_CL}/05 Descriptor Optimization/05-2 Model-based Selection/Decision_Tree_Selection.py")
@@ -71,7 +71,9 @@ _load(f"{_CL}/05 Descriptor Optimization/05-2 Model-based Selection/RFE_Selectio
 _load(f"{_CL}/05 Descriptor Optimization/05-2 Model-based Selection/SelectFromModel_Selection.py")
 _load(f"{_CL}/06 Descriptor Combination/Descriptor_Combination_MemoryE.py")
 _load(f"{_CL}/07 Hyperparameter Tuning & Model Training/Hyperparameter_Tuning_and_Model_Training.py")
-_load(f"{_CL}/08 Model Validation/Model_Validation.py")
+_load(f"{_CL}/08 Model Evaluation/08-1 Hold-out & External Performance/Model_Validation.py")
+_load(f"{_CL}/08 Model Evaluation/08-2 Chance-Correlation Test/Y_Scrambling_Validation.py")
+_load(f"{_CL}/08 Model Evaluation/08-3 Resampling Stability Assessment/Resampling_Validation.py")
 
 # =============================================================================
 # Regression modules
@@ -80,8 +82,8 @@ _REG = "Regression"
 
 _load(f"{_REG}/01 Data Load & Standardization/Data_Load_and_Standardization.py")
 _load(f"{_REG}/02 Descriptor Calculation/Descriptor_Calculation.py")
-_load(f"{_REG}/03 Descriptor Preprocessing/Descriptor_Preprocessing.py")
-_load(f"{_REG}/04 Data Split/Data_Split.py")
+_load(f"{_REG}/03 Data Split/Data_Split.py")
+_load(f"{_REG}/04 Descriptor Preprocessing/Descriptor_Preprocessing.py")
 _load(f"{_REG}/05 Descriptor Optimization/05-1 Filter-based Selection/Filter_Based_Selection.py")
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/LASSO_Selection.py")
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/Decision_Tree_Selection.py")
@@ -92,7 +94,19 @@ _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/RFE_Selecti
 _load(f"{_REG}/05 Descriptor Optimization/05-2 Model-based Selection/SelectFromModel_Selection.py")
 _load(f"{_REG}/06 Descriptor Combination/Descriptor_Combination_MemoryE.py")
 _load(f"{_REG}/07 Hyperparameter Tuning & Model Training/Hyperparameter_Tuning_and_Model_Training.py")
-_load(f"{_REG}/08 Model Validation/Model_Validation.py")
+_load(f"{_REG}/08 Model Evaluation/08-1 Hold-out & External Performance/Model_Validation.py")
+_load(f"{_REG}/08 Model Evaluation/08-2 Chance-Correlation Test/Y_Scrambling_Validation.py")
+_load(f"{_REG}/08 Model Evaluation/08-3 Resampling Stability Assessment/Resampling_Validation.py")
+
+# 09 Applicability Domain Assessment (both tracks) is loaded after every
+# 1. CLASSIFICATION / 2. REGRESSION module: each file also registers a
+# Screening-Candidate AD node under 3. SCREENER, and the node browser lists
+# top-level categories in first-registration order, not alphabetically --
+# registering 3. SCREENER's first node here (instead of inline with the
+# rest of Classification, ahead of Regression) keeps the browser's
+# 1/2/3 category order matching the numbering.
+_load(f"{_CL}/09 Applicability Domain Assessment/Applicability_Domain_Assessment.py")
+_load(f"{_REG}/09 Applicability Domain Assessment/Applicability_Domain_Assessment.py")
 
 # =============================================================================
 # Screener modules (py/ 루트에 위치)

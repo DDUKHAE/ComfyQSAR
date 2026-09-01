@@ -33,7 +33,7 @@ class select_from_model_CL:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "input_file": ("STRING", {}),
+                "descriptor_data_path": ("STRING", {"tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
                 "target_column": ("STRING", {"default": "Label"}),
                 "random_state": ("INT", {"default": 42, "min": 0, "max": 1000, "step": 1}),
                 "model_name": (["random_forest", "decision_tree", "xgboost", "lightgbm", "lasso"], {"default": "random_forest"}),
@@ -49,20 +49,20 @@ class select_from_model_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "select_from_model_feature_selection"
-    CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/1. CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def select_from_model_feature_selection(self, input_file, target_column, random_state,
+    def select_from_model_feature_selection(self, descriptor_data_path, target_column, random_state,
                                             model_name, threshold, threshold_num, alpha, max_iter,
                                             n_estimators, max_depth, min_samples_split, learning_rate):
         output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Model_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if target_column not in df.columns:
             raise ValueError(f"Target column '{target_column}' not found in the dataset.")
-        X = df.drop(columns=[target_column])
+        X = df.drop(columns=[c for c in ("Name", "SMILES", target_column) if c in df.columns])
         y = df[target_column]
         initial_feature_count = X.shape[1]
         model = get_classification_model(model_name, n_estimators, max_depth, min_samples_split, learning_rate, alpha, max_iter, random_state)
@@ -94,7 +94,8 @@ class select_from_model_CL:
             f"📊 Initial Features: {initial_feature_count}\n"
             f"📉 Selected Features: {final_feature_count}\n"
             f"🗑️ Removed: {removed_features}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}

@@ -9,7 +9,7 @@ class decision_tree_CL:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "input_file": ("STRING", {}),
+                "descriptor_data_path": ("STRING", {"tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
                 "target_column": ("STRING", {"default": "Label"}),
                 "max_depth": ("INT", {"default": 0, "min": 0, "max": 1000}),
                 "min_samples_split": ("INT", {"default": 2, "min": 2, "max": 100}),
@@ -21,19 +21,19 @@ class decision_tree_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "decision_tree_feature_selection"
-    CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/1. CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def decision_tree_feature_selection(self, input_file, target_column, max_depth, min_samples_split,
+    def decision_tree_feature_selection(self, descriptor_data_path, target_column, max_depth, min_samples_split,
                                         criterion, threshold_mode, threshold, n_iterations):
         output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Model_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if target_column not in df.columns:
             raise ValueError(f"Target column '{target_column}' not found in the dataset.")
-        X = df.drop(columns=[target_column])
+        X = df.drop(columns=[c for c in ("Name", "SMILES", target_column) if c in df.columns])
         y = df[target_column]
         initial_feature_count = X.shape[1]
         feature_importance_matrix = np.zeros((n_iterations, X.shape[1]))
@@ -71,7 +71,8 @@ class decision_tree_CL:
             f"📊 Initial Features: {initial_feature_count}\n"
             f"📉 Selected Features: {final_feature_count}\n"
             f"🗑️ Removed: {removed_features}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}

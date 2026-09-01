@@ -147,15 +147,15 @@ function getHideableWidgets(nodeDataName) {
     const widgetMappings = {
         "Descriptor_Calculations_Classification": [
             "descriptor_type", "detect_aromaticity", "log",
-            "remove_salt", "standardize_nitro", "use_file_name_as_molname",
+            "remove_salt", "standardize_nitro",
             "retain_order", "threads", "waiting_jobs",
-            "max_runtime", "max_cpd_per_file", "headless"
+            "max_runtime", "headless"
         ],
         "Descriptor_Calculations_Regression": [
             "descriptor_type", "detect_aromaticity", "log",
-            "remove_salt", "standardize_nitro", "use_filename_as_mol_name",
+            "remove_salt", "standardize_nitro",
             "retain_order", "threads", "waiting_jobs",
-            "max_runtime", "max_cpd_per_file", "headless"
+            "max_runtime", "headless"
         ]
     };
     return widgetMappings[nodeDataName] || [];

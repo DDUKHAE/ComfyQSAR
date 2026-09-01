@@ -9,7 +9,7 @@ class RandomForestFeatureSelectionNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "input_file": ("STRING", {"forceInput": False}),
+            "descriptor_data_path": ("STRING", {"forceInput": False, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "target_column": (["value"], {"default": "value"}),
             "n_estimators": ("INT", {"default": 100, "min": 10, "max": 1000, "step": 10}),
             "max_depth": ("INT", {"default": 0, "min": 0, "max": 1000, "step": 1}),
@@ -21,17 +21,17 @@ class RandomForestFeatureSelectionNode:
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "select_features"
-    CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/2. REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def select_features(self, input_file, target_column, n_estimators, max_depth,
+    def select_features(self, descriptor_data_path, target_column, n_estimators, max_depth,
                         min_samples_split, criterion, threshold_mode, threshold, n_iterations):
         try:
             output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
             os.makedirs(output_dir, exist_ok=True)
-            df = pd.read_csv(input_file)
+            df = pd.read_csv(descriptor_data_path)
 
             target_column = "value"
             n_estimators = self._safe_int(n_estimators, 100, 10, 1000)
@@ -45,7 +45,7 @@ class RandomForestFeatureSelectionNode:
 
             if target_column not in df.columns:
                 raise ValueError(f"Target column '{target_column}' not found.")
-            X = df.drop(columns=[target_column]).select_dtypes(include=[np.number])
+            X = df.drop(columns=[c for c in (target_column, "Name", "SMILES") if c in df.columns]).select_dtypes(include=[np.number])
             y = df[target_column]
             initial_feature_count = X.shape[1]
             max_depth_val = None if max_depth == 0 else max_depth
@@ -84,7 +84,8 @@ class RandomForestFeatureSelectionNode:
                 f"📊 Initial Features: {initial_feature_count}\n"
                 f"📉 Selected Features: {final_feature_count}\n"
                 f"🗑️ Removed Features: {initial_feature_count - final_feature_count}\n"
-                f"💾 Output File: {os.path.basename(output_file)}\n"
+                f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+                f"💾 Output: {os.path.basename(output_file)}\n"
                 "========================================"
             )
             return {"ui": {"text": log_message}, "result": (str(output_file),)}

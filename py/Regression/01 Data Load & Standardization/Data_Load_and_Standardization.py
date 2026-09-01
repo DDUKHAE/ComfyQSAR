@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import SDWriter
@@ -6,30 +7,22 @@ import folder_paths
 import traceback
 from typing import List, Tuple, Dict, Any, Optional
 
-METAL_IONS = {
-    'Li', 'Be', 'Na', 'Mg', 'Al', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn',
-    'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'Rb', 'Sr', 'Y', 'Zr', 'Nb',
-    'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Cs', 'Ba',
-    'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er',
-    'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',
-    'Tl', 'Pb', 'Bi', 'Th', 'Pa', 'U'
-}
+# standardize_mol lives in code/py/_shared/ -- the ONE module shared across
+# tracks/nodes in this codebase, because training (here) and screening
+# (Screener/custom_user_screener.py) must standardize molecules identically
+# or the same physical compound could be represented differently (or
+# dropped by one path and not the other) depending on which stage sees it.
+_PY_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_SHARED_DIR = os.path.join(_PY_DIR, "_shared")
+if _SHARED_DIR not in sys.path:
+    sys.path.insert(0, _SHARED_DIR)
+from chem_standardize import standardize_mol  # noqa: E402
 
 def validate_file_path(file_path: str, supported_extensions: Tuple[str, ...]) -> None:
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     if not file_path.lower().endswith(supported_extensions):
         raise ValueError(f"Unsupported file format. Use one of {supported_extensions}.")
-
-def filter_molecule(mol: Optional[Chem.Mol]) -> bool:
-    if mol is None:
-        return False
-    atom_symbols = {atom.GetSymbol() for atom in mol.GetAtoms()}
-    if atom_symbols and atom_symbols.issubset(METAL_IONS):
-        return False
-    if len(Chem.GetMolFrags(mol)) > 1:
-        return False
-    return True
 
 class Data_Loader_Regression:
     @classmethod
@@ -44,7 +37,7 @@ class Data_Loader_Regression:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("MERGED_DATA",)
     FUNCTION = "load_data"
-    CATEGORY = "QSAR/REGRESSION/OTHERS"
+    CATEGORY = "QSAR/2. REGRESSION/OTHERS"
     OUTPUT_NODE = True
 
     def load_data(self, smiles_file_path: str, value_file_path: str) -> Dict[str, Any]:
@@ -76,7 +69,7 @@ class Data_Loader_Regression:
                 "========================================\n"
                 "🔹 Regression Data Loaded! 🔹\n"
                 "========================================\n"
-                f"✅ Compounds: {len(merged_df)+1}\n"
+                f"✅ Compounds: {len(merged_df)}\n"
                 f"📊 Value Column: '{value_col}'\n"
                 f"💾 Output File: {os.path.basename(output_file)}\n"
                 "========================================"
@@ -97,7 +90,7 @@ class Standardization_Regression:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("STANDARDIZED_DATA",)
     FUNCTION = "standardize_data"
-    CATEGORY = "QSAR/REGRESSION/OTHERS"
+    CATEGORY = "QSAR/2. REGRESSION/OTHERS"
     OUTPUT_NODE = True
 
     def standardize_data(self, merged_data: str) -> Dict[str, Any]:
@@ -106,26 +99,90 @@ class Standardization_Regression:
             os.makedirs(output_dir, exist_ok=True)
             df = pd.read_csv(merged_data)
             initial_count = len(df)
-            valid_rows = []
+
+            report_rows = []
+            kept_rows = []
+            n_fragment_changed = n_charge_changed = n_tautomer_changed = 0
+            n_rejected_unparseable = n_rejected_metal = n_rejected_empty = 0
+
             for _, row in df.iterrows():
-                mol = Chem.MolFromSmiles(str(row['SMILES'])) if pd.notna(row['SMILES']) else None
-                if filter_molecule(mol):
-                    valid_rows.append(row)
-            filtered_df = pd.DataFrame(valid_rows).reset_index(drop=True)
+                original_smiles = str(row['SMILES']) if pd.notna(row['SMILES']) else None
+                mol = Chem.MolFromSmiles(original_smiles) if original_smiles else None
+                std_mol, info = standardize_mol(mol)
+
+                if info["status"] == "rejected":
+                    if info["reason"] == "unparseable":
+                        n_rejected_unparseable += 1
+                    elif info["reason"] == "metal_only":
+                        n_rejected_metal += 1
+                    else:
+                        n_rejected_empty += 1
+                    report_rows.append({
+                        "original_smiles": original_smiles, "standardized_smiles": "",
+                        "status": "rejected", "reason": info["reason"], "changed": False,
+                        "fragment_changed": False, "charge_changed": False, "tautomer_changed": False,
+                    })
+                    continue
+
+                standardized_smiles = Chem.MolToSmiles(std_mol)
+                n_fragment_changed += int(info["fragment_changed"])
+                n_charge_changed += int(info["charge_changed"])
+                n_tautomer_changed += int(info["tautomer_changed"])
+                report_rows.append({
+                    "original_smiles": original_smiles, "standardized_smiles": standardized_smiles,
+                    "status": "ok", "reason": "",
+                    "changed": info["fragment_changed"] or info["charge_changed"] or info["tautomer_changed"],
+                    "fragment_changed": info["fragment_changed"],
+                    "charge_changed": info["charge_changed"], "tautomer_changed": info["tautomer_changed"],
+                })
+                kept_rows.append({"SMILES": standardized_smiles, "value": row["value"]})
+
+            filtered_df = pd.DataFrame(kept_rows).reset_index(drop=True)
+            n_duplicates = int(filtered_df["SMILES"].duplicated().sum()) if len(filtered_df) else 0
+
             output_file = os.path.join(output_dir, "standardized_compounds.csv")
             filtered_df.to_csv(output_file, index=False)
+
+            report_file = os.path.join(output_dir, "standardization_report.csv")
+            pd.DataFrame(report_rows).to_csv(report_file, index=False)
+
+            # Only surface a sub-line when that category actually has a
+            # nonzero count -- a clean run should read as one short line,
+            # not a wall of "0" breakdowns the user has to scan past.
+            n_rejected_total = n_rejected_unparseable + n_rejected_metal + n_rejected_empty
+            n_changed_total = n_fragment_changed + n_charge_changed + n_tautomer_changed
+            body_lines = [f"✅ {len(filtered_df)}/{initial_count} kept"]
+            if n_rejected_total:
+                parts = [f"{name} {v}" for name, v in (
+                    ("unparseable", n_rejected_unparseable),
+                    ("metal-only", n_rejected_metal),
+                    ("empty-after-standardization", n_rejected_empty),
+                ) if v]
+                body_lines.append(f"   ⚠️  Rejected {n_rejected_total}: {', '.join(parts)}")
+            if n_changed_total:
+                parts = [f"{name} {v}" for name, v in (
+                    ("fragment/salt", n_fragment_changed),
+                    ("charge", n_charge_changed),
+                    ("tautomer", n_tautomer_changed),
+                ) if v]
+                body_lines.append(f"   🧪 Changed {n_changed_total}: {', '.join(parts)}")
+            if n_duplicates:
+                body_lines.append(f"   ⚠️  {n_duplicates} duplicate SMILES kept (not removed)")
+
+            rel_dir = os.path.relpath(output_dir, folder_paths.get_output_directory())
             log_message = (
                 "========================================\n"
                 "🔹 Standardization Completed! 🔹\n"
                 "========================================\n"
-                f"✅ Initial: {initial_count+1}, Filtered: {len(filtered_df)+1}\n"
-                f"🗑️ Removed: {(initial_count+1) - (len(filtered_df)+1)}\n"
-                f"💾 Output File: {os.path.basename(output_file)}\n"
+                + "\n".join(body_lines) + "\n"
+                f"📁 Directory: {rel_dir}{os.sep}\n"
+                f"💾 Output: {os.path.basename(output_file)}\n"
+                f"📋 Report: {os.path.basename(report_file)}\n"
                 "========================================"
             )
             return {"ui": {"text": log_message}, "result": (str(output_file),)}
         except Exception as e:
-            return {"ui": {"text": f"❌ Error: {e}"}, "result": ("",)}
+            return {"ui": {"text": f"❌ Error: {e}\n{traceback.format_exc()}"}, "result": ("",)}
 
 class Load_and_Standardize_Regression:
     @classmethod
@@ -140,7 +197,7 @@ class Load_and_Standardize_Regression:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("STANDARDIZED_DATA",)
     FUNCTION = "run"
-    CATEGORY = "QSAR/REGRESSION"
+    CATEGORY = "QSAR/2. REGRESSION"
     OUTPUT_NODE = True
 
     def run(self, smiles_file_path: str, value_file_path: str):

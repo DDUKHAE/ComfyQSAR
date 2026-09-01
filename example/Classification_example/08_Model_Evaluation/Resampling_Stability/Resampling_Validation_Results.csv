@@ -1,0 +1,2 @@
+test_scope,method,n_train,n_repeats,cv_splits_per_repeat,mean_accuracy,std_accuracy,mean_balanced_accuracy,std_balanced_accuracy,mean_f1,std_f1,mean_mcc,std_mcc
+fixed_descriptor_set,repeated_stratified_kfold,673,10,5,0.860921248142645,0.0026745913818722405,0.7233375993174425,0.002827190562687738,0.5944694714192871,0.005677850973117779,0.5346928154052206,0.008710327346527177

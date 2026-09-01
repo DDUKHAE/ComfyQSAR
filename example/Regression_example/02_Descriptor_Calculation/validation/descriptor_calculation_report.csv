@@ -1,0 +1,9 @@
+original_index,SMILES,status
+0,COc1nc(CC(O)(COCc2ccccc2)COCc2ccccc2)c(C)c(OC)n1,kept
+1,O=c1[nH]c(=O)n(CCC(CO)CO)cc1C#Cc1ccc(Br)cc1,kept
+2,CCCCCC#Cc1cn(CCC(COC(C)=O)COC(C)=O)c(=O)n(C(=O)c2ccccc2)c1=O,kept
+3,CC(=O)OCC(CCn1cc(C#CCc2ccccc2)c(=O)n(C(=O)c2ccccc2)c1=O)COC(C)=O,kept
+4,C#CCCCC#Cc1cn(C/C=C2\OC(=O)C(OCc3ccccc3)=C2OCc2ccccc2)c(=O)[nH]c1=O,kept
+5,CCCCCc1cc2cn(C/C=C3\OC(=O)C(OCc4ccccc4)=C3OCc3ccccc3)c(=O)nc2o1,kept
+6,Cc1ccc(-c2cc3cn(C/C=C4\OC(=O)C(OCc5ccccc5)=C4OCc4ccccc4)c(=O)nc3o2)cc1,kept
+7,CCCCCCC#Cc1cn(C/C=C2\OC(=O)C(OCc3ccccc3)=C2OCc2ccccc2)c(=O)[nH]c1=O,kept

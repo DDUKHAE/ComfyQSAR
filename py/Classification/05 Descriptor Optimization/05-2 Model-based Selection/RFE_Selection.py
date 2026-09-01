@@ -33,7 +33,7 @@ class rfe_CL:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "input_file": ("STRING", {}),
+                "descriptor_data_path": ("STRING", {"tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
                 "target_column": ("STRING", {"default": "Label"}),
                 "model_name": (["random_forest", "decision_tree", "xgboost", "lightgbm", "lasso"], {"default": "random_forest"}),
                 "n_features": ("INT", {"default": 10, "min": 1, "max": 1000}),
@@ -47,19 +47,19 @@ class rfe_CL:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "rfe_feature_selection_node"
-    CATEGORY = "QSAR/CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/1. CLASSIFICATION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def rfe_feature_selection_node(self, input_file, target_column, model_name, n_features,
+    def rfe_feature_selection_node(self, descriptor_data_path, target_column, model_name, n_features,
                                     alpha, max_iter, n_estimators, max_depth, min_samples_split, learning_rate):
         output_dir = os.path.join(folder_paths.get_output_directory(), "Classification", "05_Descriptor_Optimization", "Model_Based")
         os.makedirs(output_dir, exist_ok=True)
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(descriptor_data_path)
         if target_column not in df.columns:
             raise ValueError(f"Target column '{target_column}' not found in the dataset.")
-        X = df.drop(columns=[target_column])
+        X = df.drop(columns=[c for c in ("Name", "SMILES", target_column) if c in df.columns])
         y = df[target_column]
         initial_feature_count = X.shape[1]
         model = get_classification_model(model_name, n_estimators, max_depth, min_samples_split, learning_rate, alpha, max_iter)
@@ -83,7 +83,8 @@ class rfe_CL:
             f"📊 Initial Features: {initial_feature_count}\n"
             f"📉 Selected Features: {final_feature_count}\n"
             f"🗑️ Removed: {removed_features}\n"
-            f"💾 Output File: {os.path.basename(output_file)}\n"
+            f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+            f"💾 Output: {os.path.basename(output_file)}\n"
             "========================================"
         )
         return {"ui": {"text": log_message}, "result": (str(output_file),)}

@@ -33,7 +33,7 @@ class RFEFeatureSelectionNode:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "input_file_path": ("STRING", {"forceInput": True}),
+            "descriptor_data_path": ("STRING", {"forceInput": True, "tooltip": "Training data only -- from 4 directly, or from another 5.1/5.2 step already applied to it (05.1/05.2 can be combined in any order). The full dataset leaks the hold-out set into selection."}),
             "target_column": ("STRING", {"default": "value"}),
             "model_name": (s.MODELS, {"default": "random_forest"}),
             "n_features_to_select": ("INT", {"default": 50, "min": 1, "max": 10000, "step": 1}),
@@ -44,20 +44,20 @@ class RFEFeatureSelectionNode:
         }}
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("SELECTED_DESCRIPTORS",)
+    RETURN_NAMES = ("SELECTED_DESCRIPTOR_DATA",)
     FUNCTION = "select_features"
-    CATEGORY = "QSAR/REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
+    CATEGORY = "QSAR/2. REGRESSION/5. Descriptor Optimization/5.2 Model-based Selection"
     OUTPUT_NODE = True
 
-    def select_features(self, input_file_path, target_column, model_name, n_features_to_select,
+    def select_features(self, descriptor_data_path, target_column, model_name, n_features_to_select,
                         n_estimators, max_depth, learning_rate, alpha):
         try:
             output_dir = os.path.join(folder_paths.get_output_directory(), "Regression", "05_Descriptor_Optimization", "Model_Based")
             os.makedirs(output_dir, exist_ok=True)
-            df = pd.read_csv(input_file_path)
+            df = pd.read_csv(descriptor_data_path)
             if target_column not in df.columns:
                 raise ValueError(f"Target column '{target_column}' not found.")
-            X = df.drop(columns=[target_column]).select_dtypes(include=[np.number])
+            X = df.drop(columns=[c for c in (target_column, "Name", "SMILES") if c in df.columns]).select_dtypes(include=[np.number])
             y = df[target_column]
             initial_feature_count = X.shape[1]
             if n_features_to_select > initial_feature_count:
@@ -81,7 +81,8 @@ class RFEFeatureSelectionNode:
                 f"📊 Initial Features: {initial_feature_count}\n"
                 f"📉 Selected Features: {final_feature_count}\n"
                 f"🗑️ Removed Features: {initial_feature_count - final_feature_count}\n"
-                f"💾 Output File: {os.path.basename(output_file)}\n"
+                f"📁 Directory: {os.path.relpath(output_dir, folder_paths.get_output_directory())}{os.sep}\n"
+                f"💾 Output: {os.path.basename(output_file)}\n"
                 "========================================"
             )
             return {"ui": {"text": log_message}, "result": (str(output_file),)}
