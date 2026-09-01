@@ -4,7 +4,7 @@
 
 ![ComfyQSAR Logo](https://img.shields.io/badge/ComfyQSAR-QSAR%20Modeling-blue?style=for-the-badge)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
-[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg?style=flat-square)](https://www.python.org/downloads/)
+[![Python 3.13](https://img.shields.io/badge/python-3.10-blue.svg?style=flat-square)](https://www.python.org/downloads/)
 [![ComfyUI v0.4.0](https://img.shields.io/badge/ComfyUI-v0.4.0-green?style=flat-square)](https://github.com/comfyanonymous/ComfyUI)
 
 **A Visual Node-Based QSAR Modeling Platform for ComfyUI**
