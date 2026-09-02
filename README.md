@@ -105,7 +105,7 @@ Two screening modes are available:
 ### Prerequisites
 
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI) installed
-- Python 3.10
+- Python 3.13
 - Java Runtime Environment (JRE 11+) for PaDEL-Descriptor
 
 ### Method : Git Clone + Conda Environment
@@ -114,7 +114,7 @@ Two screening modes are available:
 cd ComfyUI/custom_nodes
 git clone https://github.com/DDUKHAE/ComfyQSAR.git
 cd ComfyQSAR
-conda create -n comfyqsar python=3.10 -y
+conda create -n comfyqsar python=3.13 -y
 conda activate comfyqsar
 pip install -r requirements.txt
 ```
