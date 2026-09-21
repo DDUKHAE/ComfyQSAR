@@ -6,10 +6,11 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg?style=flat-square)](https://www.python.org/downloads/)
 [![ComfyUI v0.4.0](https://img.shields.io/badge/ComfyUI-v0.4.0-green?style=flat-square)](https://github.com/comfyanonymous/ComfyUI)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22208316.svg)](https://zenodo.org/records/22208316)
 
 **A Visual Node-Based QSAR Modeling Platform for ComfyUI**
 
-[Features](#features) • [Installation](#installation) • [Quick Start](#quick-start) • [Node Reference](#node-reference) • [Examples](#examples)
+[Features](#features) • [Installation](#installation) • [Quick Start](#quick-start) • [Node Reference](#node-reference) • [Examples](#examples) • [Data & Models](#data--resources)
 
 </div>
 
@@ -477,10 +478,20 @@ full run produces, not just the final model.
 Each dataset folder has its own `README.md` with the source citation and a
 step-by-step file index.
 
+See [requirements.txt](requirements.txt) for the complete list. [requirements-tested.txt](requirements-tested.txt) pins the exact package versions this release was tested against (Python 3.10.13, ComfyUI v0.4.0, Java OpenJDK 11.0.27).
 ---
 
-See [requirements.txt](requirements.txt) for the complete list. [requirements-tested.txt](requirements-tested.txt) pins the exact package versions this release was tested against (Python 3.10.13, ComfyUI v0.4.0, Java OpenJDK 11.0.27).
+## Data & Resources
 
+All benchmark datasets, precomputed screening databases, preprocessed molecular features, and sample model artifacts are publicly archived on **Zenodo**:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22208316.svg)](https://zenodo.org/records/22208316)
+
+- **Zenodo Archive**: [10.5281/zenodo.22208316](https://zenodo.org/records/22208316)
+- **Contents**:
+  - Benchmark datasets (`QDB116`, `QDB261`, and PTP1B custom screening walkthrough files)
+  - Pre-computed compound databases for `QSAR/3. SCREENER`
+  - Preprocessed descriptor matrices and trained pipeline artifacts
 ---
 
 ## License
